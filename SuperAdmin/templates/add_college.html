@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% extends 'super_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="col-sm-12 col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add New College</h4><br>
+                                <form action="{% url 'Save_college' %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" placeholder="Name" name="name"><br>
+
+                                                    <div class="form-group">
+                                                        <textarea class="form-control" rows="3" placeholder="Address" name="address"></textarea>
+                                                    </div>
+
+                                                    <input type="email" class="form-control" placeholder="Email" name="email"><br>
+                                                    <input type="text" class="form-control" placeholder="Website" name="web"><br>
+                                                    <input type="text" class="form-control" placeholder="Mobile Number" name="mob"><br>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="inputGroupFile01" name="logo">
+                                                        <label class="custom-file-label" for="inputGroupFile01">Insert Logo</label>
+                                                    </div>
+                                                </div>
+                                                <br><h4 class="card-title">Add User Details</h4><br>
+                                                <input type="text" class="form-control" placeholder="Username" name="college_uname"><br>
+                                                <input type="password" class="form-control" placeholder="Password" name="college_pswd"><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <div class="text-left">
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <button type="reset" class="btn btn-dark">Reset</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+</body>
+</html>
+{% endblock %}

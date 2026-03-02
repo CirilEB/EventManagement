@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body><!DOCTYPE html>
+{% extends 'college_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="col-sm-12 col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add New Event</h4><br>
+                                <form action="{% url 'Save_event' %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="hidden" class="form-control" name="euname" value="{{ request.session.username }}"><br>
+                                                    <input type="text" class="form-control" placeholder="Title" name="title"><br>
+
+                                                    <div class="form-group">
+                                                        <textarea class="form-control" rows="3" placeholder="Description" name="description"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text">Event Type</label>
+                                                </div>
+                                                <select class="custom-select" id="" name="type">
+                                                    <option selected="">Choose...</option>
+                                                    <option>Workshop</option>
+                                                    <option>Internship</option>
+                                                    <option>Hackathon</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text">Department</label>
+                                                </div>
+                                                <select class="custom-select" id="" name="dept">
+                                                    <option selected="">Choose...</option>
+                                                    <option>BCA</option>
+                                                    <option>MCA</option>
+                                                    <option>EIE</option>
+                                                    <option>ECE</option>
+                                                    <option>EEE</option>
+                                                    <option>BBA</option>
+                                                    <option>MBA</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Start Date</label>
+                                                    <input type="date" class="form-control" name="start">
+                                                </div>
+                                            </div>
+                                             <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>End Date</label>
+                                                    <input type="date" class="form-control" name="end">
+                                                </div>
+                                            </div>
+                                             <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Registration Dead Line</label>
+                                                    <input type="date" class="form-control" name="dead">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text">Mode</label>
+                                                </div>
+                                                <select class="custom-select" id="" name="mode">
+                                                    <option selected="">Choose...</option>
+                                                    <option>Online</option>
+                                                    <option>Offline</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" placeholder="Location" name="location">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <input type="number" class="form-control" placeholder="Max Students" min="1" name="maxS">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" placeholder="Registration Fee" name="fee">
+                                            </div>
+                                        </div><br>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="" name="certificate">
+                                                        <label class="custom-file-label">Insert Certificate Template</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="" name="poster">
+                                                        <label class="custom-file-label">Insert Brochure/Poster</label>
+                                                </div>
+                                            </div>
+                                        </div><br>
+                                    </div>
+                                    <div class="form-actions">
+                                        <div class="text-left">
+                                            <button type="submit" class="btn btn-info">Submit</button>
+                                            <button type="reset" class="btn btn-dark">Reset</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+</body>
+</html>
+{% endblock %}
+</html>

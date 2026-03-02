@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% extends 'super_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="col-sm-12 col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Edit College Details</h4><br>
+                                <form action="{% url 'update_college' college_id=college.id %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" placeholder="Name" name="name" value="{{ college.name }}"><br>
+
+                                                    <div class="form-group">
+                                                        <textarea class="form-control" rows="3" placeholder="Address" name="address">{{ college.address }}</textarea>
+                                                    </div>
+
+                                                    <input type="email" class="form-control" placeholder="Email" name="email" value="{{ college.email }}"><br>
+                                                    <input type="text" class="form-control" placeholder="Website" name="web" value="{{ college.web }}"><br>
+                                                    <input type="text" class="form-control" placeholder="Mobile Number" name="mob" value="{{ college.mob }}"><br>
+
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="inputGroupFile01" name="logo">
+                                                        <label class="custom-file-label" for="inputGroupFile01">Insert Logo</label>
+                                                    </div>
+                                                    <img src="{{ college.logo.url }}" alt="" height="100px">
+                                                </div>
+                                                <br><h4 class="card-title">Add User Details</h4><br>
+                                                <input type="text" class="form-control" placeholder="Username" name="college_uname" value="{{ college.cuname }}"><br>
+                                                <input type="password" class="form-control" placeholder="Password" name="college_pswd" value="{{ college.cpswd }}"><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <div class="text-left">
+                                            <button type="submit" class="btn btn-info">Update</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+</body>
+</html>
+{% endblock %}

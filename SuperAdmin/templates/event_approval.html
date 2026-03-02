@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% extends 'super_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">All Events</h4><br>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class="bg-info text-white">
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Description</th>
+                                                <th>Event Type</th>
+                                                <th>Department</th>
+                                                <th>Starting</th>
+                                                <th>Ending</th>
+                                                <th>Regestration Deadline</th>
+                                                <th>Mode</th>
+                                                <th>Location</th>
+                                                <th>Max Participants</th>
+                                                <th>Registration Fees</th>
+                                                <th>Certificate Template</th>
+                                                <th>Poster</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for i in allEvent %}
+                                            <tr>
+                                                <td>{{ i.title }}</td>
+                                                <td>{{ i.description }}</td>
+                                                <td>{{ i.type }}</td>
+                                                <td>{{ i.dept }}</td>
+                                                <td>{{ i.start }}</td>
+                                                <td>{{ i.end }}</td>
+                                                <td>{{ i.dead }}</td>
+                                                <td>{{ i.mode }}</td>
+                                                <td>{{ i.location }}</td>
+                                                <td>{{ i.maxS }}</td>
+                                                <td>{{ i.fee }}</td>
+                                                <td>
+                                                    <img src="{{ i.certificate.url }}" alt="" height="50px">
+                                                </td>
+                                                <td>
+                                                    <img src="{{ i.poster.url }}" alt="" height="50px">
+                                                </td>
+                                                <td>
+                                                    <div style="display:flex;gap:10px;">
+                                                    <a class="btn btn-rounded">{{ i.status }}</a>
+                                                        {% if i.status == "Pending" %}
+                                                        <form action="{% url 'event_approval' approval_id=i.id %}" method="post">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-success btn-rounded" style="color:white;">Approve</button>
+                                                        </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+</body>
+</html>
+{% endblock %}
