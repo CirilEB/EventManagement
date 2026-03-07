@@ -22,5 +22,7 @@ urlpatterns=[
     path('delete_event/<int:delete_id>', views.delete_event, name='delete_event'),
     path('Registrations/',views.college_registered_events,name='registrations'),
     path('student_registrations/<int:viewreg_id>/',views.student_registrations,name='student_registrations'),
-    path('delete_register/<int:delete_id>', views.delete_register, name='delete_register')
+    path('delete_register/<int:delete_id>', views.delete_register, name='delete_register'),
+    path('QrScanPage/',views.QrScanPage,name='QrScanPage'),
+    path('process-qr/',views.process_qr,name='process_qr')
 ]

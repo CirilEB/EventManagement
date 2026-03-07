@@ -1,10 +1,13 @@
+import json
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.files.storage import FileSystemStorage
 from SuperAdmin.models import CollegeDb, EventDb
 from django.contrib.auth.models import User
 from django.contrib.auth import  authenticate,login
-
+from django.views.decorators.csrf import csrf_exempt
 from WebApp.models import RegistrationDb
 
 
@@ -146,7 +149,26 @@ def delete_register(request,delete_id):
     registered.delete()
     return redirect(college_registered_events)
 
+def QrScanPage(request):
+    return render(request,'college_qrscan.html')
 
+@csrf_exempt
+def process_qr(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        s_name = data.get("name")
+        s_email = data.get("email")
+        s_mob = data.get("mobile")
+        s_event = data.get("event")
+        print(s_name,s_email,s_mob,s_event)
+        RegistrationDb.objects.filter(
+            sname = s_name,
+            semail = s_email,
+            smob = s_mob,
+            event_name = s_event
+        ).update(sattendance="Present")
+
+        return HttpResponse(status=204)
 
 
 

@@ -34,7 +34,11 @@
                                             <td>{{ i.syear }}</td>
                                             <td>{{ i.smob }}</td>
                                             <td>
-                                                <a href="" class="btn btn-success">Give Attendance</a><br><br>
+                                                {% if i.sattendance == "Present" %}
+                                                <a class="btn btn-success" style="color:white;">{{ i.sattendance }}</a><br><br>
+                                                {% else %}
+                                                <a class="btn btn-primary" style="color:white;">{{ i.sattendance }}</a><br><br>
+                                                {% endif %}
                                                 <a href="{% url 'delete_register' delete_id=i.id %}" class="btn btn-danger">Delete</a>
                                             </td>
                                         </tr>

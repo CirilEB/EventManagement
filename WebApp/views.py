@@ -39,7 +39,8 @@ def Save_registration(request):
             "department" : sdept,
             "year" : syear,
             "email" : semail,
-            "mobile" : smob
+            "mobile" : smob,
+            "event" : event_name
         }
         json_data = json.dumps(data)
         qr = qrcode.make(json_data)

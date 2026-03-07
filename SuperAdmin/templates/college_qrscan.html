@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+{% extends 'college_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Student Details</h2>
+<p id="result"></p>
+<div id="reader" style="width:350px;"></div>
+<style>
+    #reader video{
+        transform:scaleX(-1);
+    }
+</style>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    function onScanSuccess(decodedText){
+        try{
+            let data = JSON.parse(decodedText)
+            document.getElementById("result").innerText =
+                "Name         :" + data.name +
+                "\nEvent      :" + data.event +
+                "\nCollege    :" + data.college +
+                "\nDepartment :" + data.department +
+                "\nYear       :" + data.year +
+                "\nEmail      :" + data.email +
+                "\nMobile     :" + data.mobile
+            fetch("/AdminPanel/process-qr/",{
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+        }catch(e){
+            document.getElementById("result").innerText = "Invalid QR code"
+        }
+    }let scanner = new Html5QrcodeScanner(
+        "reader",
+        { fps: 10, qrbox: 200 }
+    );
+    scanner.render(onScanSuccess);
+</script>
+</body>
+</html>
+{% endblock %}
