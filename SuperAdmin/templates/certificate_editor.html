@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% extends 'college_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h2>Certificate Editor</h2>
+    <p>{{ event.title }}</p>
+    <div id="canvas" style="position:relative; display:inline-block; border:1px solid black;">
+        <img src="{{ event.certificate.url }}" width="500">
+
+        <div id="nameField" class="drag" style="left:{{ event.name_x|default:50 }}px;top:{{ event.name_y|default:50 }}px;">Student Name</div>
+        <div id="eventField" class="drag" style="left:{{ event.event_x|default:50 }}px;top:{{ event.event_y|default:50 }}px;">Event Name</div>
+        <div id="dateField" class="drag" style="left:{{ event.date_x|default:50 }}px;top:{{ event.date_y|default:50 }}px;">Participation Date</div>
+    </div><br><br>
+    <button onclick="savePositions()" class="btn btn-success">Save Positions</button>
+    <style>
+        .drag{
+            position:absolute;
+            padding:5px 10px;
+            baackground:white;
+            border:1px solid black;
+            cursor:move;
+        }
+    </style>
+    <script>
+        // Drag Function
+        function dragElement(elmnt){
+            let pos1=0,pos2=0,pos3=0,pos4=0
+            elmnt.onmousedown=dragMouseDown
+            function dragMouseDown(e){
+                e.preventDefault()
+
+                pos3=e.clientX
+                pos4=e.clientY
+
+                document.onmouseup=closeDrag
+                document.onmousemove=elementDrag
+
+            }
+            function elementDrag(e){
+                e.preventDefault()
+
+                pos1=pos3-e.clientX
+                pos2=pos4-e.clientY
+
+                pos3=e.clientX
+                pos4=e.clientY
+
+                elmnt.style.top=(elmnt.offsetTop-pos2)+"px"
+                elmnt.style.left=(elmnt.offsetLeft-pos1)+"px"
+            }
+            function closeDrag(){
+                document.onemouseup=null
+                document.onmousemove=null
+            }
+        }
+        dragElement(document.getElementById("nameField"))
+        dragElement(document.getElementById("eventField"))
+        dragElement(document.getElementById("dateField"))
+
+        // Save Function
+        function savePositions(){
+            let name = document.getElementById("nameField")
+            let event = document.getElementById("eventField")
+            let date = document.getElementById("dateField")
+
+            fetch("/AdminPanel/save-positions/",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-CSRFToken":"{{ csrf_token }}"
+                },
+                body:JSON.stringify({
+                    event_id:"{{ event.id }}",
+
+                    name_x:name.offsetLeft,
+                    name_y:name.offsetTop,
+
+                    event_x:event.offsetLeft,
+                    event_y:event.offsetTop,
+
+                    date_x:date.offsetLeft,
+                    date_y:date.offsetTop
+                })
+            })
+            .then(res => res.json())
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

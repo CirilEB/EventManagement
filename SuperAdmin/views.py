@@ -1,5 +1,8 @@
 import json
-
+import os
+from django.core.mail import EmailMessage
+from PIL import Image, ImageDraw, ImageFont
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
@@ -137,17 +140,36 @@ def college_registered_events(request):
     return render(request,'view_registrations.html',{'event':event})
 
 def student_registrations(request,viewreg_id):
-    event = EventDb.objects.filter(id=viewreg_id)
     eventname = EventDb.objects.get(id=viewreg_id)
     registered = RegistrationDb.objects.filter(event_name=eventname.title)
-    return render(request,'student_registrations.html',{
-        'event':event,
-        'registered':registered
-    })
+    return render(request,'student_registrations.html',{'registered':registered})
+
 def delete_register(request,delete_id):
     registered = RegistrationDb.objects.filter(id=delete_id)
     registered.delete()
     return redirect(college_registered_events)
+
+
+def certificate_editor(request,e_certi):
+    event = EventDb.objects.get(id=e_certi)
+    return render(request,"certificate_editor.html",{"event":event})
+def save_positions(request):
+    data = json.loads(request.body)
+    event = EventDb.objects.get(id=data["event_id"])
+
+    event.name_x = data["name_x"]
+    event.name_y = data["name_y"]
+
+    event.event_x = data["event_x"]
+    event.event_y = data["event_y"]
+
+    event.date_x = data["date_x"]
+    event.date_y = data["date_y"]
+
+    event.save()
+    return HttpResponse(status=204)
+
+
 
 def QrScanPage(request):
     return render(request,'college_qrscan.html')
@@ -167,6 +189,49 @@ def process_qr(request):
             smob = s_mob,
             event_name = s_event
         ).update(sattendance="Present")
+
+        #certificate generation
+        event = EventDb.objects.filter(title=s_event).first()
+        img = Image.open(event.certificate.path)
+        img_width, img_height = img.size
+        dispaly_width = 500
+        scale = img_width / dispaly_width
+
+        name_x = int(event.name_x * scale)
+        name_y = int(event.name_y * scale)
+        event_x = int(event.event_x * scale)
+        event_y = int(event.event_y * scale)
+        date_x = int(event.date_x * scale)
+        date_y = int(event.date_y * scale)
+
+        base_font_size = 20
+        font_size = int(base_font_size * scale)
+        font = ImageFont.truetype("arial.ttf", font_size)
+
+        draw = ImageDraw.Draw(img)
+
+        # text_bbox = draw.textbbox((0,0), event.title, font=font)
+        # text_width = text_bbox[2] - text_bbox[0]
+        # center_x_event = (img_width - text_width) // 2
+
+
+        draw.text((name_x, name_y), s_name, fill="black", font=font)
+        draw.text((event_x, event_y), event.title, fill="black", font=font)
+        draw.text((date_x, date_y), str(event.start), fill="black", font=font)
+
+        folder = os.path.join(settings.MEDIA_ROOT, "Students_Certificates")
+        os.makedirs(folder, exist_ok=True)
+        output_path = os.path.join(folder, f"{s_name}_{s_event}.png")
+        img.save(output_path)
+
+        email = EmailMessage(
+            subject=event.title,
+            body="Thank you for participating our program, your certificate is attached with this email.For any issues, contact to our website.",
+            from_email="cirileb2003@gmail.com",
+            to=[s_email]
+        )
+        email.attach_file(output_path)
+        email.send()
 
         return HttpResponse(status=204)
 
