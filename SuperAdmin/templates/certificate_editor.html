@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% extends 'college_admin.html' %}
 {% block content %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,14 +10,30 @@
 <body>
     <h2>Certificate Editor</h2>
     <p>{{ event.title }}</p>
-    <div id="canvas" style="position:relative; display:inline-block; border:1px solid black;">
+
+<div style="display:flex;gap:50px;">
+<!--    certificate set position-->
+    <div id="canvas" style="position:relative;border:1px solid black;">
         <img src="{{ event.certificate.url }}" width="500">
 
         <div id="nameField" class="drag" style="left:{{ event.name_x|default:50 }}px;top:{{ event.name_y|default:50 }}px;">Student Name</div>
         <div id="eventField" class="drag" style="left:{{ event.event_x|default:50 }}px;top:{{ event.event_y|default:50 }}px;">Event Name</div>
         <div id="dateField" class="drag" style="left:{{ event.date_x|default:50 }}px;top:{{ event.date_y|default:50 }}px;">Participation Date</div>
         <div id="qrField" class="drag" style="left:{{ event.qr_x|default:50 }}px;top:{{ event.qr_y|default:50 }}px;">QR</div>
+    </div>
+
+
+<!--    certificate preview-->
+    <div id="preview" style="position:relative;border:1px solid black;">
+        <img src="{{ event.certificate.url }}" width="500">
+
+        <div id="previewName" class="previewText" style="left:{{ event.name_x|default:50 }}px;top:{{ event.name_y|default:50 }}px;">Student_Name</div>
+        <div id="previewEvent" class="previewText" style="left:{{ event.event_x|default:50 }}px;top:{{ event.event_y|default:50 }}px;">{{ event.title }}</div>
+        <div id="previewDate" class="previewText" style="left:{{ event.date_x|default:50 }}px;top:{{ event.date_y|default:50 }}px;">{{ event.start }}</div>
+        <img id="previewQR"  width="80" src="{% static 'Super/assets/images/sample_qr.png' %}" style="left:{{ event.qr_x|default:50 }}px;top:{{ event.qr_y|default:50 }}px;">
     </div><br><br>
+
+</div>
     <button onclick="savePositions()" class="btn btn-success">Save Positions</button>
     <style>
         .drag{
@@ -25,9 +42,23 @@
             baackground:white;
             border:1px solid black;
             cursor:move;
+            z-index:10;
+        }
+        .previewText{
+            position:absolute;
+            font-weight:bold;
+        }
+        #previewQR{
+            position:absolute;
         }
     </style>
     <script>
+        const previewMap = {
+            nameField:"previewName",
+            eventField:"previewEvent",
+            dateField:"previewDate",
+            qrField:"previewQR"
+        }
         // Drag Function
         function dragElement(elmnt){
             let pos1=0,pos2=0,pos3=0,pos4=0
@@ -53,6 +84,16 @@
 
                 elmnt.style.top=(elmnt.offsetTop-pos2)+"px"
                 elmnt.style.left=(elmnt.offsetLeft-pos1)+"px"
+
+                // move preview element
+                let previewId = previewMap[elmnt.id]
+                if(previewId){
+                    let previewElement = document.getElementById(previewId)
+                    if(previewElement){
+                    previewElement.style.top = elmnt.offsetTop + "px"
+                    previewElement.style.left = elmnt.offsetLeft + "px"
+                    }
+                }
             }
             function closeDrag(){
                 document.onemouseup=null
