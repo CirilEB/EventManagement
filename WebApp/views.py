@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 import json
 import qrcode
 from io import BytesIO
+from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 from SuperAdmin.models import EventDb
 from WebApp.models import RegistrationDb
@@ -30,7 +31,6 @@ def Save_registration(request):
         syear = request.POST.get('syear')
         smob = request.POST.get('smob')
         obj = RegistrationDb(event_name=event_name,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
-        obj.save()
 
         # qrcode generation
         data = {
@@ -46,7 +46,12 @@ def Save_registration(request):
         qr = qrcode.make(json_data)
         buffer = BytesIO()
         qr.save(buffer, format="PNG")
-        # email  notification
+        # save image to media
+        filename = f"{sname}_{event_name}_qr.png"
+        obj.qr_image.save(filename, ContentFile(buffer.getvalue()), save=True)
+
+        obj.save()
+        # email notification
         email_message = EmailMessage(
             subject = event_name,
             body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",

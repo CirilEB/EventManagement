@@ -166,6 +166,9 @@ def save_positions(request):
     event.date_x = data["date_x"]
     event.date_y = data["date_y"]
 
+    event.qr_x = data["qr_x"]
+    event.qr_y = data["qr_y"]
+
     event.save()
     return HttpResponse(status=204)
 
@@ -203,10 +206,20 @@ def process_qr(request):
         event_y = int(event.event_y * scale)
         date_x = int(event.date_x * scale)
         date_y = int(event.date_y * scale)
+        qr_x = int(event.qr_x * scale)
+        qr_y = int(event.qr_y * scale)
+
 
         base_font_size = 20
         font_size = int(base_font_size * scale)
         font = ImageFont.truetype("arial.ttf", font_size)
+
+        reg = RegistrationDb.objects.get(sname = s_name,event_name = s_event)
+        qr_img = Image.open(reg.qr_image.path).convert("RGB")
+        base_qr_size = 80
+        qr_size = int(base_qr_size * scale)
+        qr_img = qr_img.resize((qr_size,qr_size), Image.NEAREST)
+        img.paste(qr_img,(qr_x,qr_y))
 
         draw = ImageDraw.Draw(img)
 

@@ -10,3 +10,4 @@ class RegistrationDb(models.Model):
     syear = models.CharField(max_length=10)
     smob = models.IntegerField()
     sattendance = models.CharField(max_length=20,default="Absent")
+    qr_image = models.ImageField(upload_to="student_qr",null=True,blank=True)
