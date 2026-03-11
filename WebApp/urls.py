@@ -7,5 +7,7 @@ urlpatterns=[
     path('Contact/',views.Contact,name='Contact'),
     path('Events/',views.Events,name='Events'),
     path('Register/<int:event_id>/',views.Register,name='Register'),
-    path('Save_registration',views.Save_registration,name='Save_registration')
+    path('Save_registration',views.Save_registration,name='Save_registration'),
+    path('qr_valid/',views.qr_valid,name='qr_valid'),
+    path('process_qr/',views.process_qr,name='process_qr')
 ]

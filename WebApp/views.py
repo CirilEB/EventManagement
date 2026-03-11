@@ -1,3 +1,5 @@
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 import json
 import qrcode
@@ -40,7 +42,9 @@ def Save_registration(request):
             "year" : syear,
             "email" : semail,
             "mobile" : smob,
-            "event" : event_name
+            "event" : event_name,
+            "status" : "NotVerified",
+            "message": "NotVerified"
         }
         json_data = json.dumps(data)
         qr = qrcode.make(json_data)
@@ -63,3 +67,26 @@ def Save_registration(request):
         return redirect(Events)
 
 
+def qr_valid(request):
+    return render(request,'qr_verify.html')
+@csrf_exempt
+def process_qr(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        s_name = data.get("name")
+        s_email = data.get("email")
+        s_mob = data.get("mobile")
+        s_event = data.get("event")
+        print(s_name,s_email,s_mob,s_event)
+        reg = RegistrationDb.objects.filter(
+            sname = s_name,
+            event_name = s_event,
+        ).first()
+        if reg is None:
+            return JsonResponse({"status":"error","message":"Unknown Credentials"})
+        elif reg.sattendance == "Present":
+            return JsonResponse({"status":"success","message":"Verified Certificate"})
+        else:
+            return JsonResponse({"status":"error","message":"Unknown Credentials"})
+
+        return HttpResponse(status=204)
