@@ -1,13 +1,16 @@
+from django.utils import timezone
+from datetime import timedelta
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 import json
 import qrcode
+import random
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 from SuperAdmin.models import EventDb
-from WebApp.models import RegistrationDb
+from WebApp.models import RegistrationDb, StudentDb
 
 
 # Create your views here.
@@ -90,3 +93,49 @@ def process_qr(request):
             return JsonResponse({"status":"error","message":"Unknown Credentials"})
 
         return HttpResponse(status=204)
+
+def MyRegistrations(request):
+    return render(request,'MyRegistrations.html')
+def student_loginPage(request):
+    return render(request,'student_login.html')
+def student_signup(request):
+    return render(request,'student_signup.html')
+def save_signup(request):
+    if request.method == "POST":
+        student_name = request.POST.get('student_name')
+        student_email = request.POST.get('student_email')
+        student_pass = request.POST.get('student_pass')
+        otp = random.randint(100000,999999)
+        obj = StudentDb(student_name=student_name,student_email=student_email,student_pass=student_pass,student_otp=otp)
+        obj.save()
+        request.session['student_name'] = student_name
+        email_message = EmailMessage(
+            subject="OTP Verification",
+            body="Your OTP to register for Event Registraion Portal is " + str(otp),
+            from_email="cirileb2003@gmail.com",
+            to=[student_email]
+        )
+        email_message.send()
+
+        return redirect(verify_otp)
+def verify_otp(request):
+    return render(request,'otp_verificationPage.html')
+def check_otp(request):
+    if request.method == "POST":
+        entered_otp = request.POST.get('enterotp')
+        student_name = request.session.get('student_name')
+        student = StudentDb.objects.get(student_name=student_name)
+        del request.session['student_name']
+        if timezone.now() > student.created_at + timedelta(minutes=5):
+            student.delete()
+            return redirect(student_signup)
+        if student.student_otp == entered_otp:
+            student.is_verified = True
+            student.save()
+            return redirect(student_loginPage)
+def login_check(request):
+    if request.method == "POST":
+        Lname = request.POST.get('name')
+        Lpass = request.POST.get('pass')
+        if StudentDb.objects.filter(student_name=Lname,student_pass=Lpass).exists():
+            return redirect(Home)

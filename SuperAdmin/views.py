@@ -1,5 +1,7 @@
 import json
 import os
+from io import BytesIO
+from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
@@ -232,10 +234,17 @@ def process_qr(request):
         draw.text((event_x, event_y), event.title, fill="black", font=font)
         draw.text((date_x, date_y), str(event.start), fill="black", font=font)
 
-        folder = os.path.join(settings.MEDIA_ROOT, "Students_Certificates")
-        os.makedirs(folder, exist_ok=True)
-        output_path = os.path.join(folder, f"{s_name}_{s_event}.png")
-        img.save(output_path)
+
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        filename = f"{s_name}_{s_event}.png"
+        reg.certificate_image.save(
+            filename,
+            ContentFile(buffer.getvalue()),
+            save=True
+        )
+
+
 
         email = EmailMessage(
             subject=event.title,
@@ -243,7 +252,11 @@ def process_qr(request):
             from_email="cirileb2003@gmail.com",
             to=[s_email]
         )
-        email.attach_file(output_path)
+        email.attach(
+            filename,
+            buffer.getvalue(),
+            "image/png"
+        )
         email.send()
 
         return HttpResponse(status=204)
