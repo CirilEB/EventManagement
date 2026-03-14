@@ -2,7 +2,9 @@ from django.db import models
 
 # Create your models here.
 class RegistrationDb(models.Model):
+    Logname = models.CharField(max_length=50,default="")
     event_name = models.CharField(max_length=100)
+    event_date = models.CharField(max_length=20,default="")
     sname = models.CharField(max_length=30)
     semail = models.CharField(max_length=50)
     scollege = models.CharField(max_length=100)

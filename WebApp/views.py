@@ -28,14 +28,16 @@ def Register(request,event_id):
     return render(request,'Register.html',{'register':register})
 def Save_registration(request):
     if request.method == "POST":
+        Logname = request.session.get('Logname')
         event_name = request.POST.get('event_name')
+        event_date = request.POST.get('event_date')
         sname = request.POST.get('sname')
         semail = request.POST.get('semail')
         scollege = request.POST.get('scollege')
         sdept = request.POST.get('sdept')
         syear = request.POST.get('syear')
         smob = request.POST.get('smob')
-        obj = RegistrationDb(event_name=event_name,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
+        obj = RegistrationDb(Logname=Logname,event_name=event_name,event_date=event_date,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
 
         # qrcode generation
         data = {
@@ -95,7 +97,18 @@ def process_qr(request):
         return HttpResponse(status=204)
 
 def MyRegistrations(request):
-    return render(request,'MyRegistrations.html')
+    student = request.session.get('Logname')
+    registrations = RegistrationDb.objects.filter(Logname=student)
+    reg_present = RegistrationDb.objects.filter(Logname=student,sattendance="Present").count()
+    reg_absent = RegistrationDb.objects.filter(Logname=student,sattendance="Absent").count()
+    total_reg = RegistrationDb.objects.filter(Logname=student).count()
+    return render(request,'MyRegistrations.html',{
+        'student':student,
+        'registrations':registrations,
+        'reg_present':reg_present,
+        'reg_absent':reg_absent,
+        'total_reg':total_reg
+    })
 def student_loginPage(request):
     return render(request,'student_login.html')
 def student_signup(request):
@@ -138,4 +151,7 @@ def login_check(request):
         Lname = request.POST.get('name')
         Lpass = request.POST.get('pass')
         if StudentDb.objects.filter(student_name=Lname,student_pass=Lpass).exists():
+            request.session['Logname'] = Lname
             return redirect(Home)
+        else:
+            return redirect(student_loginPage)
