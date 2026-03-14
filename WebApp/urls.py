@@ -16,5 +16,7 @@ urlpatterns=[
     path('verify_otp/',views.verify_otp,name='verify_otp'),
     path('save_signup',views.save_signup,name='save_signup'),
     path('check_otp',views.check_otp,name='check_otp'),
-    path('login_check',views.login_check,name='login_check')
+    path('login_check',views.login_check,name='login_check'),
+    path('filteredEvents/<dept_name>/',views.filteredEvents,name='filteredEvents'),
+    path('signout',views.signout,name='signout')
 ]

@@ -75,14 +75,14 @@
                     <a href="{% url 'Home' %}" class="nav-item nav-link">Home</a>
                     <a href="{% url 'Events' %}" class="nav-item nav-link">Events</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Departments</a>
+                        <a href="#" class="nav-link dropdown-toggle active" data-toggle="dropdown">Departments</a>
                         <div class="dropdown-menu m-0">
                             {% for i in alldepartments %}
                             <a href="{% url 'filteredEvents' dept_name=i.code %}" class="dropdown-item">{{ i.code }}</a>
                             {% endfor %}
                         </div>
                     </div>
-                    <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link active">My Registrations</a>
+                    <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link">My Registrations</a>
                     <a href="{% url 'About' %}" class="nav-item nav-link">About</a>
                     <a href="{% url 'Contact' %}" class="nav-item nav-link">Contact</a>
                 </div>
@@ -100,27 +100,74 @@
     <!-- Header Start -->
     <div class="jumbotron jumbotron-fluid page-header position-relative overlay-bottom" style="margin-bottom: 90px;">
         <div class="container text-center py-5">
-            <h1 class="text-white display-1">Verify Cretificate</h1>
+            <h1 class="text-white display-1" style="font-size:60px;">{{ filter_name.name }}</h1>
             <div class="d-inline-flex text-white mb-5">
                 <p class="m-0 text-uppercase"><a class="text-white" href="">Home</a></p>
                 <i class="fa fa-angle-double-right pt-1 px-3"></i>
-                <p class="m-0 text-uppercase">My Registrations</p>
-                <i class="fa fa-angle-double-right pt-1 px-3"></i>
-                <p class="m-0 text-uppercase">Verify Certificate</p>
+                <p class="m-0 text-uppercase">Departments</p>
             </div>
         </div>
     </div>
     <!-- Header End -->
 
 
-<!--    QRScanner-->
-    <div class="container" style="text-align:center;">
-<h1>Scan and Verify your Certificate is Valid or Not</h1>
-        <h5 id="result1"></h5>
-        <h5 id="result"></h5>
-        <div id="reader" style="width:350px;margin:auto"></div>
+    <!-- Courses Start -->
+    <div class="container-fluid py-5">
+        <div class="container py-5">
+            <div class="row mx-0 justify-content-center">
+                <div class="col-lg-8">
+                    <div class="section-title text-center position-relative mb-5">
+                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">All Events</h6>
+                        <h1 class="display-4">Register Now</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% for i in filtered %}
+                {% if i.status == "Approved" %}
+                <div class="col-lg-4 col-md-6 pb-4">
+                    <a class="courses-list-item position-relative d-block overflow-hidden mb-2" href="{% url 'Register' event_id=i.id %}">
+                        <img class="img-fluid" src="{{ i.poster.url }}" alt="">
+                        <div class="courses-text">
+                            <h4 class="text-center text-white px-3">{{ i.title }}</h4>
+                            <h6 class="text-center text-white px-3">{{ i.euname }}</h6>
+                            <div class="border-top w-100 mt-3">
+                                <div class="d-flex justify-content-between p-4">
+                                    <span class="text-white">{{ i.type }}</span>
+                                    <span class="text-white">Rs.
+                                        <small>{{ i.fee }}</small></span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-lg justify-content-center mb-0">
+                          <li class="page-item disabled">
+                            <a class="page-link rounded-0" href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                              <span class="sr-only">Previous</span>
+                            </a>
+                          </li>
+                          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item">
+                            <a class="page-link rounded-0" href="#" aria-label="Next">
+                              <span aria-hidden="true">&raquo;</span>
+                              <span class="sr-only">Next</span>
+                            </a>
+                          </li>
+                        </ul>
+                      </nav>
+                </div>
+            </div>
+        </div>
     </div>
-<!--    QRScanner-->
+    <!-- Courses End -->
 
 
     <!-- Footer Start -->
@@ -212,47 +259,6 @@
 
     <!-- Template Javascript -->
     <script src="{% static 'Web/js/main.js' %}"></script>
-    <style>
-    #reader video{
-        transform:scaleX(-1);
-    }
-</style>
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-    function onScanSuccess(decodedText){
-        document.getElementById("result1").innerText = "";
-        try{
-            let data = JSON.parse(decodedText);
-            document.getElementById("result1").innerText =
-                "This certificate is belong to " + data.name;
-            fetch("/EventRegister/process_qr/",{
-                method: "POST",
-                headers: {
-                    "Content-Type" : "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(data => {
-            const statusElement = document.getElementById("result");
-            if (data.status == "success"){
-                statusElement.innerText = data.message;
-                statusElement.className = 'text-success';
-            }else{
-                statusElement.innerText = data.message;
-                statusElement.className = 'text-danger';
-            }
-            })
-        }catch(e){
-            document.getElementById("result").className = 'text-danger';
-            document.getElementById("result").innerText = "Invalid QR code"
-        }
-    }let scanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: 200 }
-    );
-    scanner.render(onScanSuccess);
-</script>
 </body>
 
 </html>

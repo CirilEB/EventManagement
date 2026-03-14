@@ -9,23 +9,47 @@ import random
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
-from SuperAdmin.models import EventDb
+from SuperAdmin.models import EventDb, DepartmentDb
 from WebApp.models import RegistrationDb, StudentDb
 
 
 # Create your views here.
 def Home(request):
-    return render(request,'Home.html')
+    student = request.session.get('Logname')
+    alldepartments = DepartmentDb.objects.all()
+    return render(request,'Home.html',{
+        'student':student,
+        'alldepartments':alldepartments
+    })
+def filteredEvents(request,dept_name):
+    filtered = EventDb.objects.filter(euname=dept_name)
+    filter_name = DepartmentDb.objects.get(code=dept_name)
+    alldepartments = DepartmentDb.objects.all()
+    return render(request,'filtered_events.html',{
+        'filtered':filtered,
+        'filter_name':filter_name,
+        'alldepartments':alldepartments
+    })
 def About(request):
-    return render(request,'About.html')
+    alldepartments = DepartmentDb.objects.all()
+    return render(request,'About.html',{'alldepartments':alldepartments})
 def Contact(request):
-    return render(request,'Contact.html')
+    alldepartments = DepartmentDb.objects.all()
+    return render(request,'Contact.html',{'alldepartments':alldepartments})
 def Events(request):
+    alldepartments = DepartmentDb.objects.all()
     Allevents = EventDb.objects.all()
-    return render(request,'Events.html',{'Allevents':Allevents})
+    return render(request,'Events.html',{
+        'Allevents':Allevents,
+        'alldepartments':alldepartments
+    })
 def Register(request,event_id):
+    alldepartments = DepartmentDb.objects.all()
     register = EventDb.objects.get(id=event_id)
-    return render(request,'Register.html',{'register':register})
+    return render(request,'Register.html',{
+        'register':register,
+        'alldepartments':alldepartments
+    })
 def Save_registration(request):
     if request.method == "POST":
         Logname = request.session.get('Logname')
@@ -73,7 +97,8 @@ def Save_registration(request):
 
 
 def qr_valid(request):
-    return render(request,'qr_verify.html')
+    alldepartments = DepartmentDb.objects.all()
+    return render(request,'qr_verify.html',{'alldepartments':alldepartments})
 @csrf_exempt
 def process_qr(request):
     if request.method == "POST":
@@ -97,6 +122,7 @@ def process_qr(request):
         return HttpResponse(status=204)
 
 def MyRegistrations(request):
+    alldepartments = DepartmentDb.objects.all()
     student = request.session.get('Logname')
     registrations = RegistrationDb.objects.filter(Logname=student)
     reg_present = RegistrationDb.objects.filter(Logname=student,sattendance="Present").count()
@@ -107,7 +133,8 @@ def MyRegistrations(request):
         'registrations':registrations,
         'reg_present':reg_present,
         'reg_absent':reg_absent,
-        'total_reg':total_reg
+        'total_reg':total_reg,
+        'alldepartments':alldepartments
     })
 def student_loginPage(request):
     return render(request,'student_login.html')
@@ -155,3 +182,6 @@ def login_check(request):
             return redirect(Home)
         else:
             return redirect(student_loginPage)
+def signout(request):
+    del request.session['Logname']
+    return redirect(Home)

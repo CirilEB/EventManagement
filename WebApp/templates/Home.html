@@ -77,14 +77,20 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Departments</a>
                         <div class="dropdown-menu m-0">
-                            <a href="detail.html" class="dropdown-item">Course Detail</a>
+                            {% for i in alldepartments %}
+                            <a href="{% url 'filteredEvents' dept_name=i.code %}" class="dropdown-item">{{ i.code }}</a>
+                            {% endfor %}
                         </div>
                     </div>
                     <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link">My Registrations</a>
                     <a href="{% url 'About' %}" class="nav-item nav-link">About</a>
                     <a href="{% url 'Contact' %}" class="nav-item nav-link">Contact</a>
                 </div>
+                {% if request.session.Logname %}
+                <a href="{% url 'signout' %}" class="btn btn-primary py-2 px-4 d-none d-lg-block">Logout</a>
+                {% else %}
                 <a href="{% url 'student_loginPage' %}" class="btn btn-primary py-2 px-4 d-none d-lg-block">Login</a>
+                {% endif %}
             </div>
         </nav>
     </div>
@@ -93,26 +99,14 @@
 
     <!-- Header Start -->
     <div class="jumbotron jumbotron-fluid position-relative overlay-bottom" style="margin-bottom: 90px;">
-        <div class="container text-center my-5 py-5">
-            <h1 class="text-white mt-4 mb-4">Learn From Home</h1>
-            <h1 class="text-white display-1 mb-5">Education Courses</h1>
-            <div class="mx-auto mb-5" style="width: 100%; max-width: 600px;">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <button class="btn btn-outline-light bg-white text-body px-4 dropdown-toggle" type="button" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">Courses</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Courses 1</a>
-                            <a class="dropdown-item" href="#">Courses 2</a>
-                            <a class="dropdown-item" href="#">Courses 3</a>
-                        </div>
-                    </div>
-                    <input type="text" class="form-control border-light" style="padding: 30px 25px;" placeholder="Keyword">
-                    <div class="input-group-append">
-                        <button class="btn btn-secondary px-4 px-lg-5">Search</button>
-                    </div>
-                </div>
-            </div>
+        <div class="container text-center my-5">
+            {% if request.session.Logname %}
+            <h1 class="text-white mt-4 mb-4">Hi {{ student }}</h1>
+            <h1 class="text-white display-1 mb-5">Welcome</h1>
+            {% else %}
+            <h1 class="text-white display-1 mb-5">Welcome</h1>
+            <h1 class="text-white mt-4 mb-4">to our site</h1>
+            {% endif %}
         </div>
     </div>
     <!-- Header End -->
