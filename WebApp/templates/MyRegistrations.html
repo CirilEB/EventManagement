@@ -109,6 +109,9 @@
 
     <!-- Contact Start -->
     <div class="container">
+        <div class="col-md-12 p-5" style="text-align:center;">
+        <a class="btn btn-outline-primary p-3" style="font-size:25px;" href="{% url 'qr_valid' %}">Check validity of certificate</a>
+        </div>
         {% if request.session.Logname %}
         <h1>Registrations done by {{ request.session.Logname }}</h1>
         <h3>Total Events registered : {{ total_reg }}</h3>

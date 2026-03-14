@@ -1,13 +1,12 @@
 from django.db import models
 
 # Create your models here.
-class CollegeDb(models.Model):
+class DepartmentDb(models.Model):
     name = models.CharField(max_length=100)
-    address = models.CharField(max_length=300)
-    email = models.CharField(max_length=100)
-    web = models.CharField(max_length=100)
+    code = models.CharField(max_length=20)
+    email = models.CharField(max_length=50)
     mob = models.IntegerField()
-    logo = models.ImageField(upload_to="College_Logo")
+    hod = models.CharField(max_length=50)
     cuname = models.CharField(max_length=50,default="")
     cpswd = models.CharField(max_length=20,default="")
     def __str__(self):
@@ -18,7 +17,6 @@ class EventDb(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
     type = models.CharField(max_length=20)
-    dept = models.CharField(max_length=10)
     start = models.DateField()
     end = models.DateField()
     dead = models.DateField()

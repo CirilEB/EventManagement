@@ -108,11 +108,11 @@
 
 
 <!--    QRScanner-->
-    <div class="container">
+    <div class="container" style="text-align:center;">
 <h1>Scan and Verify your Certificate is Valid or Not</h1>
         <h5 id="result1"></h5>
         <h5 id="result"></h5>
-        <div id="reader" style="width:350px;"></div>
+        <div id="reader" style="width:350px;margin:auto"></div>
     </div>
 <!--    QRScanner-->
 
@@ -214,6 +214,7 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
     function onScanSuccess(decodedText){
+        document.getElementById("result1").innerText = "";
         try{
             let data = JSON.parse(decodedText);
             document.getElementById("result1").innerText =
@@ -237,6 +238,7 @@
             }
             })
         }catch(e){
+            document.getElementById("result").className = 'text-danger';
             document.getElementById("result").innerText = "Invalid QR code"
         }
     }let scanner = new Html5QrcodeScanner(

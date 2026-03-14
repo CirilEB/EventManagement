@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.files.storage import FileSystemStorage
-from SuperAdmin.models import CollegeDb, EventDb
+from SuperAdmin.models import DepartmentDb, EventDb
 from django.contrib.auth.models import User
 from django.contrib.auth import  authenticate,login
 from django.views.decorators.csrf import csrf_exempt
@@ -22,44 +22,37 @@ def SuperAdminPanel(request):
 def AddCollege(request):
     return render(request,'add_college.html')
 def ViewCollege(request):
-    college = CollegeDb.objects.all()
+    college = DepartmentDb.objects.all()
     return render(request,'view_college.html',{'college':college})
 def Save_college(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        address = request.POST.get('address')
+        code = request.POST.get('code')
         email = request.POST.get('email')
-        website = request.POST.get('web')
         mobile = request.POST.get('mob')
-        logo = request.FILES['logo']
+        hod = request.POST.get('hod')
         cuname = request.POST.get('college_uname')
         cpswd = request.POST.get('college_pswd')
-        obj = CollegeDb(name=name,address=address,email=email,web=website,mob=mobile,logo=logo,cuname=cuname,cpswd=cpswd)
+        obj = DepartmentDb(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
         obj.save()
         return redirect(AddCollege)
 def delete_college(request,college_id):
-    college = CollegeDb.objects.filter(id=college_id)
+    college = DepartmentDb.objects.filter(id=college_id)
     college.delete()
     return redirect(ViewCollege)
 def EditCollege(request,college_id):
-    college = CollegeDb.objects.get(id=college_id)
+    college = DepartmentDb.objects.get(id=college_id)
     return render(request,'edit_college.html',{'college':college})
 def update_college(request,college_id):
     if request.method == 'POST':
         name = request.POST.get('name')
-        address = request.POST.get('address')
+        code = request.POST.get('code')
         email = request.POST.get('email')
-        website = request.POST.get('web')
         mobile = request.POST.get('mob')
+        hod = request.POST.get('hod')
         cuname = request.POST.get('college_uname')
         cpswd = request.POST.get('college_pswd')
-        try:
-            logo = request.FILES['logo']
-            fs = FileSystemStorage()
-            file = fs.save(logo.name,logo)
-        except MultiValueDictKeyError:
-            file = CollegeDb.objects.get(id=college_id).logo
-        CollegeDb.objects.filter(id=college_id).update(name=name,address=address,email=email,web=website,mob=mobile,logo=file,cuname=cuname,cpswd=cpswd)
+        DepartmentDb.objects.filter(id=college_id).update(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
         return redirect(ViewCollege)
 
 def login_page(request):
@@ -69,6 +62,7 @@ def admin_login(request):
     if request.method == "POST":
         uname = request.POST.get('username')
         pswd = request.POST.get('password')
+    #college admin if
     if User.objects.filter(username__contains=uname).exists():
         user = authenticate(username=uname,password=pswd)
         if user is not None:
@@ -79,9 +73,12 @@ def admin_login(request):
         else:
             print("Invalid Details..!")
             return redirect(login_page)
-    elif CollegeDb.objects.filter(cuname=uname, cpswd=pswd).exists():
+    #department admin if
+    elif DepartmentDb.objects.filter(cuname=uname, cpswd=pswd).exists():
+        dept = DepartmentDb.objects.filter(cuname=uname,cpswd=pswd).first()
         request.session['username'] = uname
         request.session['password'] = pswd
+        request.session['department'] = dept.code
         return redirect(CollegeAdminPanel)
     else:
         print("User not found..!")
@@ -103,7 +100,6 @@ def Save_event(request):
         title = request.POST.get('title')
         desc = request.POST.get('description')
         type = request.POST.get('type')
-        dept = request.POST.get('dept')
         start = request.POST.get('start')
         end = request.POST.get('end')
         dead = request.POST.get('dead')
@@ -113,11 +109,11 @@ def Save_event(request):
         fee = request.POST.get('fee')
         certify = request.FILES['certificate']
         poster = request.FILES['poster']
-        obj = EventDb(euname=euname,title=title,description=desc,type=type,dept=dept,start=start,end=end,dead=dead,mode=mode,location=loc,maxS=maxS,fee=fee,certificate=certify,poster=poster)
+        obj = EventDb(euname=euname,title=title,description=desc,type=type,start=start,end=end,dead=dead,mode=mode,location=loc,maxS=maxS,fee=fee,certificate=certify,poster=poster)
         obj.save()
         return redirect(AddEvent)
 def view_event(request):
-    uname = request.session.get('username')
+    uname = request.session.get('department')
     own_event = EventDb.objects.filter(euname=uname)
     return render(request,'view_event.html',{'own_event':own_event})
 
@@ -137,7 +133,7 @@ def delete_event(request,delete_id):
     return redirect(view_event)
 
 def college_registered_events(request):
-    uname = request.session.get('username')
+    uname = request.session.get('department')
     event = EventDb.objects.filter(euname=uname)
     return render(request,'view_registrations.html',{'event':event})
 
