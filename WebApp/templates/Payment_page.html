@@ -206,16 +206,23 @@
     <script src="{% static 'Web/lib/waypoints/waypoints.min.js' %}"></script>
     <script src="{% static 'Web/lib/counterup/counterup.min.js' %}"></script>
     <script src="{% static 'Web/lib/owlcarousel/owl.carousel.min.js' %}"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"
-            data-key="rzp_test_SRUNBwpvVW3waU"
-            data-amount="{{ pay_str }}"
-            data-currency="INR"
-            data-order_id="{{ payment.order_id }}"
-            data-name="{{ student.event_name }}"
-            data-description="QR will be sent to your email after your payment"
-            data-prefil.name="{{ student.event_name }}"
-            data-theme.color="#316be8"
-    ></script>
+    {% if payment %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key" : "rzp_test_SRUNBwpvVW3waU",
+            "amount" : "{{ pay_str }}",
+            "currency" : "INR",
+            "order_id" : "{{ payment.id }}",
+            "name" : "{{ student.event_name }}",
+            "description" : "QR will be sent to your email after payment",
+            "callback_url" : "{% url 'verify_payment' %}"
+        };
+        var rzp = new Razorpay(options);
+        rzp.open();
+
+    </script>
+    {% endif %}
     <!-- Template Javascript -->
     <script src="{% static 'Web/js/main.js' %}"></script>
 </body>

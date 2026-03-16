@@ -54,27 +54,48 @@ def Register(request,event_id):
     })
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()
-    uname = request.session.get('Logname')
     student = RegistrationDb.objects.get(id=stud_id)
-    if uname:
-        pay = student.fee
-        amount = int(pay*100)
-        pay_str = str(amount)
-        if request.method == "POST":
+    pay = student.fee
+    amount = int(pay*100)
+    pay_str = str(amount)
+    if request.method == "POST":
             order_currency = "INR"
-            client = razorpay.client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
+            client = razorpay.Client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
             payment = client.order.create({'amount':amount,'currency':order_currency})
+            student.razorpay_order_id = payment["id"]
+            student.save()
             return render(request,'Payment_page.html',{
                 'alldepartments': alldepartments,
                 'pay_str':pay_str,
                 'payment':payment,
                 'student':student
             })
-        else:
-            return render(request, 'Payment_page.html', {
-                'alldepartments': alldepartments,
-                'pay_str': pay_str,
-            })
+    return render(request, 'Payment_page.html', {
+        'alldepartments': alldepartments,
+        'pay_str': pay_str,
+        'student': student
+    })
+@csrf_exempt
+def verify_payment(request):
+    if request.method == "POST":
+        payment_id = request.POST.get("razorpay_payment_id")
+        order_id = request.POST.get("razorpay_order_id")
+        signature = request.POST.get("razorpay_signature")
+        client = razorpay.Client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
+        params = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        try:
+            client.utility.verify_payment_signature(params)
+            student = RegistrationDb.objects.get(razorpay_order_id=order_id)
+            student.pay_status = "Paid"
+            student.save()
+            return HttpResponse(204)
+        except:
+            return HttpResponse(404)
+
 def Save_registration(request):
     if request.method == "POST":
         Logname = request.session.get('Logname')

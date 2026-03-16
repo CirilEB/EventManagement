@@ -6,6 +6,7 @@ class RegistrationDb(models.Model):
     event_name = models.CharField(max_length=100)
     event_date = models.CharField(max_length=20,default="")
     fee = models.IntegerField(null=True,blank=True)
+    razorpay_order_id = models.CharField(max_length=255,blank=True,null=True)
     sname = models.CharField(max_length=30)
     semail = models.CharField(max_length=50)
     scollege = models.CharField(max_length=100)
