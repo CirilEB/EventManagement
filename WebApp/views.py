@@ -92,7 +92,17 @@ def verify_payment(request):
             student = RegistrationDb.objects.get(razorpay_order_id=order_id)
             student.pay_status = "Paid"
             student.save()
-            return HttpResponse(204)
+            # email notification
+
+            email_message = EmailMessage(
+                subject=student.event_name,
+                body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",
+                from_email=settings.EMAIL_HOST_USER,
+                to=[student.semail]
+            )
+            email_message.attach_file(student.qr_image.path)
+            email_message.send()
+            return redirect(MyRegistrations)
         except:
             return HttpResponse(404)
 
@@ -132,18 +142,7 @@ def Save_registration(request):
 
         obj.save()
 
-        # email notification
-
-        # email_message = EmailMessage(
-        #     subject = event_name,
-        #     body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",
-        #     from_email="cirileb2003@gmail.com",
-        #     to = [semail]
-        # )
-        # email_message.attach("Event_QR.png",buffer.getvalue(),"images/png")
-        # email_message.send()
-
-        return redirect(Events)
+        return redirect(MyRegistrations)
 
 
 def qr_valid(request):

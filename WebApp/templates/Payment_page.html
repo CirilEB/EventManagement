@@ -82,8 +82,8 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link">My Registrations</a>
-                    <a href="{% url 'About' %}" class="nav-item nav-link active">About</a>
+                    <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link active">My Registrations</a>
+                    <a href="{% url 'About' %}" class="nav-item nav-link">About</a>
                     <a href="{% url 'Contact' %}" class="nav-item nav-link">Contact</a>
                 </div>
                 {% if request.session.Logname %}
