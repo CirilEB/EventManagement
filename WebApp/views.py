@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse, HttpResponse
@@ -6,6 +7,7 @@ from django.shortcuts import render, redirect
 import json
 import qrcode
 import random
+import razorpay
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
@@ -50,18 +52,42 @@ def Register(request,event_id):
         'register':register,
         'alldepartments':alldepartments
     })
+def Payment(request,stud_id):
+    alldepartments = DepartmentDb.objects.all()
+    uname = request.session.get('Logname')
+    student = RegistrationDb.objects.get(id=stud_id)
+    if uname:
+        pay = student.fee
+        amount = int(pay*100)
+        pay_str = str(amount)
+        if request.method == "POST":
+            order_currency = "INR"
+            client = razorpay.client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
+            payment = client.order.create({'amount':amount,'currency':order_currency})
+            return render(request,'Payment_page.html',{
+                'alldepartments': alldepartments,
+                'pay_str':pay_str,
+                'payment':payment,
+                'student':student
+            })
+        else:
+            return render(request, 'Payment_page.html', {
+                'alldepartments': alldepartments,
+                'pay_str': pay_str,
+            })
 def Save_registration(request):
     if request.method == "POST":
         Logname = request.session.get('Logname')
         event_name = request.POST.get('event_name')
         event_date = request.POST.get('event_date')
+        fee = request.POST.get('fee')
         sname = request.POST.get('sname')
         semail = request.POST.get('semail')
         scollege = request.POST.get('scollege')
         sdept = request.POST.get('sdept')
         syear = request.POST.get('syear')
         smob = request.POST.get('smob')
-        obj = RegistrationDb(Logname=Logname,event_name=event_name,event_date=event_date,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
+        obj = RegistrationDb(Logname=Logname,event_name=event_name,event_date=event_date,fee=fee,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
 
         # qrcode generation
         data = {
@@ -84,15 +110,18 @@ def Save_registration(request):
         obj.qr_image.save(filename, ContentFile(buffer.getvalue()), save=True)
 
         obj.save()
+
         # email notification
-        email_message = EmailMessage(
-            subject = event_name,
-            body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",
-            from_email="cirileb2003@gmail.com",
-            to = [semail]
-        )
-        email_message.attach("Event_QR.png",buffer.getvalue(),"images/png")
-        email_message.send()
+
+        # email_message = EmailMessage(
+        #     subject = event_name,
+        #     body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",
+        #     from_email="cirileb2003@gmail.com",
+        #     to = [semail]
+        # )
+        # email_message.attach("Event_QR.png",buffer.getvalue(),"images/png")
+        # email_message.send()
+
         return redirect(Events)
 
 

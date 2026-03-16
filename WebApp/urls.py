@@ -18,5 +18,6 @@ urlpatterns=[
     path('check_otp',views.check_otp,name='check_otp'),
     path('login_check',views.login_check,name='login_check'),
     path('filteredEvents/<dept_name>/',views.filteredEvents,name='filteredEvents'),
-    path('signout',views.signout,name='signout')
+    path('signout',views.signout,name='signout'),
+    path('Payment/<int:stud_id>/',views.Payment,name='Payment')
 ]

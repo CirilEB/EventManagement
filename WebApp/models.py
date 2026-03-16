@@ -5,6 +5,7 @@ class RegistrationDb(models.Model):
     Logname = models.CharField(max_length=50,default="")
     event_name = models.CharField(max_length=100)
     event_date = models.CharField(max_length=20,default="")
+    fee = models.IntegerField(null=True,blank=True)
     sname = models.CharField(max_length=30)
     semail = models.CharField(max_length=50)
     scollege = models.CharField(max_length=100)
@@ -12,6 +13,7 @@ class RegistrationDb(models.Model):
     syear = models.CharField(max_length=10)
     smob = models.IntegerField()
     sattendance = models.CharField(max_length=20,default="Absent")
+    pay_status = models.CharField(max_length=10,default="Unpaid")
     qr_image = models.ImageField(upload_to="student_qr",null=True,blank=True)
     certificate_image = models.ImageField(upload_to="Students_Certificates",null=True,blank=True)
 
