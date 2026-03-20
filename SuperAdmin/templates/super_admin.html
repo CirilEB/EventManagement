@@ -364,67 +364,80 @@
                 {% block content %}
                 <div class="card-group">
                     <div class="card border-right">
-                        <div class="card-body">
+                        <div class="card-body bg-primary">
                             <div class="d-flex d-lg-flex d-md-block align-items-center">
                                 <div>
                                     <div class="d-inline-flex align-items-center">
-                                        <h2 class="text-dark mb-1 font-weight-medium">236</h2>
-                                        <span
-                                            class="badge bg-primary font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none">+18.33%</span>
+                                        <h2 class="text-white mb-1 font-weight-medium">{{ total_reg }}</h2>
+<!--                                        <span-->
+<!--                                            class="badge bg-primary font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none">+18.33%</span>-->
                                     </div>
-                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">New Clients</h6>
+                                    <h6 class="text-white font-weight-normal mb-0 w-100 text-truncate">Total Registrations</h6>
+                                    <br><br>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <span class="opacity-7 text-muted"><i data-feather="user-plus"></i></span>
+                                    <span class="text-white"><i data-feather="user-plus"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card border-right">
-                        <div class="card-body">
+                        <div class="card-body bg-success">
                             <div class="d-flex d-lg-flex d-md-block align-items-center">
                                 <div>
-                                    <h2 class="text-dark mb-1 w-100 text-truncate font-weight-medium"><sup
-                                            class="set-doller">$</sup>18,306</h2>
-                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Earnings of Month
-                                    </h6>
+                                    <h2 class="text-white mb-1 w-100 text-truncate font-weight-medium"><sup
+                                            class="set-doller">₹</sup>{{ paid_revenue }}</h2>
+                                    <h6 class="text-white font-weight-normal mb-0 w-100 text-truncate">Total Revenue
+                                    </h6><br>
+                                    <h6 class="badge bg-warning font-12 text-dark font-weight-medium badge-pill ml-2 d-lg-block d-md-none">₹ {{ unpaid_revenue }} Pending</h6>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <span class="opacity-7 text-muted"><i data-feather="dollar-sign"></i></span>
+                                    <span class="text-white"><i data-feather="dollar-sign"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card border-right">
-                        <div class="card-body">
+                        <div class="card-body bg-light">
                             <div class="d-flex d-lg-flex d-md-block align-items-center">
                                 <div>
                                     <div class="d-inline-flex align-items-center">
-                                        <h2 class="text-dark mb-1 font-weight-medium">1538</h2>
-                                        <span
-                                            class="badge bg-danger font-12 text-white font-weight-medium badge-pill ml-2 d-md-none d-lg-block">-18.33%</span>
+                                        <h2 class="text-dark mb-1 font-weight-medium">{{ total_event }}</h2>
                                     </div>
-                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">New Projects</h6>
+                                    <h6 class="text-dark font-weight-normal mb-0 w-100 text-truncate">Total Events</h6>
+                                    <br>
+                                    <div class="d-flex" style="margin-left:-8px;">
+                                    <h6 class="badge bg-success font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none">{{ approve_event }} Approved</h6>
+                                    <h6 class="badge bg-danger font-12 text-white font-weight-medium badge-pill ml-2 d-lg-block d-md-none">{{ pending_event }} Pending</h6>
+                                    </div>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <span class="opacity-7 text-muted"><i data-feather="file-plus"></i></span>
+                                    <span class="text-dark"><i data-feather="file-plus"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body bg-dark">
                             <div class="d-flex d-lg-flex d-md-block align-items-center">
                                 <div>
-                                    <h2 class="text-dark mb-1 font-weight-medium">864</h2>
-                                    <h6 class="text-muted font-weight-normal mb-0 w-100 text-truncate">Projects</h6>
+                                    <h2 class="text-white mb-1 font-weight-medium">{{ percent }} %</h2>
+                                    <h6 class="text-white font-weight-normal mb-0 w-100 text-truncate">Attendance Percentage</h6>
+                                    <br><br>
                                 </div>
                                 <div class="ml-auto mt-md-3 mt-lg-0">
-                                    <span class="opacity-7 text-muted"><i data-feather="globe"></i></span>
+                                    <span class="text-white"><i data-feather="globe"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Department Performance</h3>
+                        <canvas id="deptChart" height="100"></canvas>
+                        <button onclick="loadChart('registrations')" class="btn btn-primary">Registrations</button>
+                        <button onclick="loadChart('revenue')" class="btn btn-secondary">Revenue</button>
                 </div>
                 {% endblock %}
                 <!-- *************************************************************** -->
@@ -477,6 +490,51 @@
     <!-- ============================================================== -->
     <!-- All Jquery -->
     <!-- ============================================================== -->
+    <script>
+        const labels = {{ labels|safe }};
+        const registrations = {{ registrations|safe }};
+        const paidReg = {{ paid_reg|safe }};
+        const revenue = {{ revenue|safe }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let chart;
+        function createChart(type){
+            const ctx = document.getElementById('deptChart').getContext('2d');
+            const data = type == 'registrations' ? registrations : revenue;
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: type === 'registrations'
+                    ? [
+                        {
+                            label: 'Total Registrations',
+                            data: registrations
+                        },
+                        {
+                            label: 'Paid Registrations',
+                            data: paidReg
+                        }
+                    ] : [
+                        {
+                            label: 'Revenue',
+                            data: revenue
+                        }
+                    ]
+                }
+            });
+        }
+        function loadChart(type){
+            if (chart){
+                chart.destroy();
+            }
+            createChart(type);
+        }
+        createChart('registrations');
+    </script>
+
+
     <script src="{% static 'Super/assets/libs/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'Super/assets/libs/popper.js/dist/umd/popper.min.js' %}"></script>
     <script src="{% static 'Super/assets/libs/bootstrap/dist/js/bootstrap.min.js' %}"></script>

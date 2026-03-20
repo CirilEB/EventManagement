@@ -109,6 +109,7 @@ def verify_payment(request):
 def Save_registration(request):
     if request.method == "POST":
         Logname = request.session.get('Logname')
+        dept_name = request.POST.get('dept_name')
         event_name = request.POST.get('event_name')
         event_date = request.POST.get('event_date')
         fee = request.POST.get('fee')
@@ -118,7 +119,7 @@ def Save_registration(request):
         sdept = request.POST.get('sdept')
         syear = request.POST.get('syear')
         smob = request.POST.get('smob')
-        obj = RegistrationDb(Logname=Logname,event_name=event_name,event_date=event_date,fee=fee,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
+        obj = RegistrationDb(Logname=Logname,dept_name=dept_name,event_name=event_name,event_date=event_date,fee=fee,sname=sname,semail=semail,scollege=scollege,sdept=sdept,syear=syear,smob=smob)
 
         # qrcode generation
         data = {

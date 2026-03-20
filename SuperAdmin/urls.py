@@ -3,7 +3,7 @@ from SuperAdmin import views
 from SuperAdmin.views import login_page
 
 urlpatterns=[
-    path('Dashboard-University/',views.SuperAdminPanel,name='SuperAdmin'),
+    path('Dashboard-College/',views.SuperAdminPanel,name='SuperAdmin'),
     path('AddCollege/',views.AddCollege,name='AddCollege'),
     path('ViewCollege/', views.ViewCollege,name='ViewCollege'),
     path('Save_college',views.Save_college,name='Save_college'),
@@ -13,7 +13,7 @@ urlpatterns=[
     path('login_page/',views.login_page,name='login_page'),
     path('admin_login',views.admin_login,name='admin_login'),
     path('admin_logout',views.admin_logout,name='admin_logout'),
-    path('Dashboard-College/',views.CollegeAdminPanel,name='CollegeAdminPanel'),
+    path('Dashboard-Department/',views.CollegeAdminPanel,name='CollegeAdminPanel'),
     path('AddEvent/', views.AddEvent, name='AddEvent'),
     path('Save_event',views.Save_event,name='Save_event'),
     path('ViewEvent/',views.view_event,name='view_event'),

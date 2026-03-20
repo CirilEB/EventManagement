@@ -1,5 +1,6 @@
 import json
 import os
+from django.db.models import Sum,Count,Q
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
@@ -18,7 +19,46 @@ from WebApp.models import RegistrationDb
 
 # Create your views here.
 def SuperAdminPanel(request):
-    return render(request,'super_admin.html')
+    #College cards
+    total_reg = RegistrationDb.objects.count()
+    total_event = EventDb.objects.count()
+    approve_event = EventDb.objects.filter(status="Approved").count()
+    pending_event = EventDb.objects.filter(status="Pending").count()
+    paid_revenue = RegistrationDb.objects.filter(pay_status="Paid").aggregate(total=Sum('fee'))['total'] or 0
+    unpaid_revenue = RegistrationDb.objects.filter(pay_status="Unpaid").aggregate(total=Sum('fee'))['total'] or 0
+    attended = RegistrationDb.objects.filter(sattendance="Present").count()
+    percent = round((attended / total_reg * 100), 2) if total_reg else 0
+
+    #Departments Chart
+    dept_data = RegistrationDb.objects.values('dept_name').annotate(
+        total_reg=Count('id'),
+        paid_reg=Count('id', filter=Q(pay_status='Paid')),
+        total_revenue=Sum('fee', filter=Q(pay_status='Paid'))
+    )
+    labels = []
+    registrations = []
+    revenue = []
+    paid_reg = []
+    for i in dept_data:
+        labels.append(i['dept_name'])
+        registrations.append(i['total_reg'])
+        paid_reg.append(i['paid_reg'])
+        revenue.append(i['total_revenue'] or 0)
+
+    return render(request,'super_admin.html',{
+        'total_reg':total_reg,
+        'total_event':total_event,
+        'paid_revenue':paid_revenue,
+        'unpaid_revenue':unpaid_revenue,
+        'percent':percent,
+        'approve_event':approve_event,
+        'pending_event':pending_event,
+
+        'labels':labels,
+        'registrations':registrations,
+        'paid_reg':paid_reg,
+        'revenue':revenue
+    })
 def AddCollege(request):
     return render(request,'add_college.html')
 def ViewCollege(request):
