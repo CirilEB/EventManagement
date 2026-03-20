@@ -130,7 +130,67 @@ def admin_logout(request):
     return redirect(login_page)
 
 def CollegeAdminPanel(request):
-    return render(request,'college_admin.html')
+    #Department Cards
+    uname = request.session.get('username')
+    dept = DepartmentDb.objects.get(cuname=uname)
+    total_reg = RegistrationDb.objects.filter(dept_name=dept.code).count()
+    paid_data = RegistrationDb.objects.filter(dept_name=dept.code,pay_status='Paid').aggregate(total=Sum('fee'))
+    revenue = paid_data['total'] or 0
+    pending_data = RegistrationDb.objects.filter(dept_name=dept.code,pay_status='Unpaid').aggregate(total=Sum('fee'))
+    unpaid_revenue = pending_data['total'] or 0
+    total_events = EventDb.objects.filter(euname=dept.code).count()
+    approve_event = EventDb.objects.filter(euname=dept.code,status='Approved').count()
+    pending_event = EventDb.objects.filter(euname=dept.code, status='Pending').count()
+    attended = RegistrationDb.objects.filter(dept_name=dept.code,sattendance='Present').count()
+    attendance_percent = round((attended / total_reg * 100), 2) if total_reg else 0
+
+    #Event Chart
+    latest_events = EventDb.objects.filter(euname=dept.code).order_by('-id').values_list('title', flat=True)[:5]
+    event_data = RegistrationDb.objects.filter(dept_name=dept.code, event_name__in=latest_events).values('event_name').annotate(
+        total_reg=Count('id'),
+        paid_reg=Count('id', filter=Q(pay_status='Paid')),
+        attended_reg=Count('id', filter=Q(sattendance='Present'))
+    )
+    event_data_dic = {i['event_name']: i for i in event_data}
+    labels = []
+    total_reg_data = []
+    paid_reg_data = []
+    attended_data =[]
+    for event in latest_events:
+        i = event_data_dic.get(event, {})
+        labels.append(event)
+        total_reg_data.append(i.get('total_reg', 0))
+        paid_reg_data.append(i.get('paid_reg', 0))
+        attended_data.append(i.get('attended_reg', 0))
+
+    #Event Leaderboard
+    top_events = RegistrationDb.objects.filter(dept_name=dept.code).values('event_name').annotate(
+        paid_reg=Count('id', filter=Q(pay_status='Paid'))
+    ).order_by('-paid_reg')[:10]
+    leaderboard = []
+    for i,j in enumerate(top_events, start=1):
+        leaderboard.append({
+            "rank": i,
+            "event": j['event_name'],
+            "count": j['paid_reg']
+        })
+
+    return render(request,'college_admin.html',{
+        'total_reg':total_reg,
+        'revenue':revenue,
+        'unpaid_revenue':unpaid_revenue,
+        'total_events':total_events,
+        'approve_event':approve_event,
+        'pending_event':pending_event,
+        'attendance_percent':attendance_percent,
+
+        'event_labels':labels,
+        'event_total':total_reg_data,
+        'event_paid':paid_reg_data,
+        'event_attended':attended_data,
+
+        'leaderboard':leaderboard
+    })
 
 def AddEvent(request):
     return render(request,'add_event.html')

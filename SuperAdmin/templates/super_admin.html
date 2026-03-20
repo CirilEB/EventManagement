@@ -436,8 +436,10 @@
                     <div class="card-body">
                         <h3 class="card-title">Department Performance</h3>
                         <canvas id="deptChart" height="100"></canvas>
+                        <br>
                         <button onclick="loadChart('registrations')" class="btn btn-primary">Registrations</button>
                         <button onclick="loadChart('revenue')" class="btn btn-secondary">Revenue</button>
+                    </div>
                 </div>
                 {% endblock %}
                 <!-- *************************************************************** -->
@@ -510,18 +512,39 @@
                     ? [
                         {
                             label: 'Total Registrations',
-                            data: registrations
+                            data: registrations,
+                            borderRadius: 8
                         },
                         {
                             label: 'Paid Registrations',
-                            data: paidReg
+                            data: paidReg,
+                            borderRadius: 8
                         }
                     ] : [
                         {
                             label: 'Revenue',
-                            data: revenue
+                            data: revenue,
+                            borderRadius: 8,
+                            backgroundColor: 'lightgreen'
                         }
                     ]
+                },
+                options: {
+                    animation: {
+                        duration: 800
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
                 }
             });
         }
