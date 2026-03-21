@@ -1,5 +1,6 @@
 import json
 import os
+from django.contrib import messages
 from django.db.models import Sum,Count,Q
 from io import BytesIO
 from django.core.files.base import ContentFile
@@ -75,10 +76,12 @@ def Save_college(request):
         cpswd = request.POST.get('college_pswd')
         obj = DepartmentDb(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
         obj.save()
-        return redirect(AddCollege)
+        messages.success(request,"Department Added Successfully")
+        return redirect(ViewCollege)
 def delete_college(request,college_id):
     college = DepartmentDb.objects.filter(id=college_id)
     college.delete()
+    messages.success(request,"Department Deleted Successfully")
     return redirect(ViewCollege)
 def EditCollege(request,college_id):
     college = DepartmentDb.objects.get(id=college_id)
@@ -93,6 +96,7 @@ def update_college(request,college_id):
         cuname = request.POST.get('college_uname')
         cpswd = request.POST.get('college_pswd')
         DepartmentDb.objects.filter(id=college_id).update(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
+        messages.success(request,"Department Updated Successfully")
         return redirect(ViewCollege)
 
 def login_page(request):
@@ -226,6 +230,7 @@ def event_approval(request,approval_id):
         event = EventDb.objects.get(id=approval_id)
         event.status = "Approved"
         event.save()
+        messages.success(request,"Event Approved Successfully")
         return redirect(all_event)
 def delete_event(request,delete_id):
     event = EventDb.objects.filter(id=delete_id)

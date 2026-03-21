@@ -17,11 +17,11 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <input type="text" class="form-control" placeholder="Department Name" name="name" value="{{ college.name }}"><br>
-                                                    <input type="text" class="form-control" placeholder="Department Code" name="code" value="{{ college.code }}"><br>
-                                                    <input type="email" class="form-control" placeholder="Email" name="email" value="{{ college.email }}"><br>
-                                                    <input type="text" class="form-control" placeholder="Mobile Number" name="mob" value="{{ college.mob }}"><br>
-                                                    <input type="text" class="form-control" placeholder="Head of Department" name="hod" value="{{ college.hod }}"><br>
+                                                    <input type="text" class="form-control" placeholder="Department Name" name="name" value="{{ college.name }}" required><br>
+                                                    <input type="text" class="form-control" placeholder="Department Code" name="code" value="{{ college.code }}" required><br>
+                                                    <input type="email" class="form-control" placeholder="Email" name="email" value="{{ college.email }}" required><br>
+                                                    <input type="text" class="form-control" placeholder="Mobile Number" name="mob" value="{{ college.mob }}" required><br>
+                                                    <input type="text" class="form-control" placeholder="Head of Department" name="hod" value="{{ college.hod }}" required><br>
                                                 </div>
                                                 <br><h4 class="card-title">Add User Details</h4><br>
                                                 <input type="text" class="form-control" placeholder="Username" name="college_uname" value="{{ college.cuname }}"><br>
