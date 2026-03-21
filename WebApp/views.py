@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 from SuperAdmin.models import EventDb, DepartmentDb
 from WebApp.models import RegistrationDb, StudentDb
+from django.contrib import messages
 
 
 # Create your views here.
@@ -102,6 +103,7 @@ def verify_payment(request):
             )
             email_message.attach_file(student.qr_image.path)
             email_message.send()
+            messages.success(request,"Payment was Successful")
             return redirect(MyRegistrations)
         except:
             return HttpResponse(404)
@@ -142,7 +144,7 @@ def Save_registration(request):
         obj.qr_image.save(filename, ContentFile(buffer.getvalue()), save=True)
 
         obj.save()
-
+        messages.success(request,"Registered Successfully - Pay Now or Later")
         return redirect(MyRegistrations)
 
 
@@ -218,20 +220,29 @@ def check_otp(request):
         del request.session['student_name']
         if timezone.now() > student.created_at + timedelta(minutes=5):
             student.delete()
+            messages.error(request, "OTP Expired !")
             return redirect(student_signup)
         if student.student_otp == entered_otp:
             student.is_verified = True
             student.save()
+            messages.success(request,"OTP Verified and Registered Successfully")
             return redirect(student_loginPage)
+        else:
+            messages.error(request,"Incorrect OTP !")
+            student.delete()
+            return redirect(student_signup)
 def login_check(request):
     if request.method == "POST":
         Lname = request.POST.get('name')
         Lpass = request.POST.get('pass')
         if StudentDb.objects.filter(student_name=Lname,student_pass=Lpass).exists():
             request.session['Logname'] = Lname
+            messages.success(request,"Successfully Logged in")
             return redirect(Home)
         else:
+            messages.error(request, "Unknown Credentials - Try Again !")
             return redirect(student_loginPage)
 def signout(request):
     del request.session['Logname']
+    messages.success(request,"Logged out Successfully")
     return redirect(Home)
