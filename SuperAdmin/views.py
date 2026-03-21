@@ -215,7 +215,8 @@ def Save_event(request):
         poster = request.FILES['poster']
         obj = EventDb(euname=euname,title=title,description=desc,type=type,start=start,end=end,dead=dead,mode=mode,location=loc,maxS=maxS,fee=fee,certificate=certify,poster=poster)
         obj.save()
-        return redirect(AddEvent)
+        messages.success(request, "Event Added Successfully - Pending for Approval")
+        return redirect(view_event)
 def view_event(request):
     uname = request.session.get('department')
     own_event = EventDb.objects.filter(euname=uname)
@@ -235,6 +236,7 @@ def event_approval(request,approval_id):
 def delete_event(request,delete_id):
     event = EventDb.objects.filter(id=delete_id)
     event.delete()
+    messages.success(request,"Event Deleted Successfully")
     return redirect(view_event)
 
 def college_registered_events(request):
