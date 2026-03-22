@@ -18,6 +18,7 @@
     <link href="{% static 'Super/assets/extra-libs/jvector/jquery-jvectormap-2.0.2.css' %}" rel="stylesheet" />
     <!-- Custom CSS -->
     <link href="{% static 'Super/dist/css/style.min.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.24/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -534,6 +535,20 @@
     <!-- ============================================================== -->
     <!-- All Jquery -->
     <!-- ============================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    {% if messages %}
+    <script>
+    {% for m in messages %}
+        Swal.fire({
+            icon: "{{ m.tags }}",
+            text: "{{ m }}",
+            timer:3000,
+            showConfirmButton: false
+        });
+    {% endfor %}
+    </script>
+    {% endif %}
     <script>
         const eventLabels = {{ event_labels|safe }};
         const totalReg = {{ event_total|safe }};

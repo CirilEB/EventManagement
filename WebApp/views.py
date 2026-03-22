@@ -189,9 +189,20 @@ def MyRegistrations(request):
         'alldepartments':alldepartments
     })
 def student_loginPage(request):
-    return render(request,'student_login.html')
+    student = request.session.get('student_name')
+    if student:
+        student_data = StudentDb.objects.get(student_name=student)
+        student_data.delete()
+        del request.session['student_name']
+        return render(request,'student_login.html')
+    else:
+        return render(request,'student_login.html')
 def student_signup(request):
     return render(request,'student_signup.html')
+def check_username(request):
+    username = request.GET.get('username')
+    exists = StudentDb.objects.filter(student_name=username).exists()
+    return JsonResponse({'exists':exists})
 def save_signup(request):
     if request.method == "POST":
         student_name = request.POST.get('student_name')

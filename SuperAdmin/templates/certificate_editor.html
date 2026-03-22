@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.24/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
     <h2>Certificate Editor</h2>
@@ -52,6 +53,8 @@
             position:absolute;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
     <script>
         const previewMap = {
             nameField:"previewName",
@@ -135,6 +138,15 @@
                 })
             })
             .then(res => res.json())
+            .then(data => {
+                Swal.fire({
+                    icon: data.status,
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            });
+            return false;
         }
     </script>
 </body>

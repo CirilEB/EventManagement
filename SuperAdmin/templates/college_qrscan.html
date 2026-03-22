@@ -17,9 +17,16 @@
 </style>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-    function onScanSuccess(decodedText){
+    let scanner;
+    let isProcessing = false;
+
+    async function onScanSuccess(decodedText){
+        if (isProcessing) return;
+        isProcessing = true;
+
+        scanner.pause();
         try{
-            let data = JSON.parse(decodedText)
+            let data = JSON.parse(decodedText);
             document.getElementById("result").innerText =
                 "Name         :" + data.name +
                 "\nEvent      :" + data.event +
@@ -27,19 +34,28 @@
                 "\nDepartment :" + data.department +
                 "\nYear       :" + data.year +
                 "\nEmail      :" + data.email +
-                "\nMobile     :" + data.mobile
-            fetch("/AdminPanel/process-qr/",{
+                "\nMobile     :" + data.mobile;
+            let res = await fetch("/AdminPanel/process-qr/",{
                 method: "POST",
                 headers: {
                     "Content-Type" : "application/json"
                 },
                 body: JSON.stringify(data)
-            })
-            .then(res => res.json())
+            });
+            let data_sweet = await res.json();
+            await Swal.fire({
+                    icon: data_sweet.status,
+                    text: data_sweet.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
         }catch(e){
-            document.getElementById("result").innerText = "Invalid QR code"
+            document.getElementById("result").innerText = "Invalid QR code";
+        }finally{
+            isProcessing = false;
+            scanner.resume();
         }
-    }let scanner = new Html5QrcodeScanner(
+    }scanner = new Html5QrcodeScanner(
         "reader",
         { fps: 10, qrbox: 200 }
     );

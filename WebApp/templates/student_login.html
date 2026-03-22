@@ -63,8 +63,9 @@
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input class="form-control" id="pwd" type="password"
+                                        <input class="form-control" id="pass" type="password"
                                             placeholder="enter your password" name="pass">
+                                        <span onclick="togglePassword()" style="position:absolute;right:15px;top:18%;transform:translate(-50%);cursor:pointer;"><i class="icon-eye"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-lg-12 text-center">
@@ -91,13 +92,23 @@
     {% for m in messages %}
         Swal.fire({
             icon: "{{ m.tags }}",
-            title: "{{ m }}",
+            text: "{{ m }}",
             timer:3000,
             showConfirmButton: false
         });
     {% endfor %}
     </script>
     {% endif %}
+    <script>
+        function togglePassword(){
+         let password = document.getElementById("pass");
+         if (password.type == "password"){
+            password.type = "text";
+         }else{
+            password.type = "password";
+         }
+        }
+    </script>
     <script src="{% static 'Super/assets/libs/jquery/dist/jquery.min.js' %} "></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="{% static 'Super/assets/libs/popper.js/dist/umd/popper.min.js' %} "></script>

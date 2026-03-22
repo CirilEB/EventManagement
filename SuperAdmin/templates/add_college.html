@@ -11,7 +11,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">Add New Department</h4><br>
-                                <form action="{% url 'Save_college' %}" method="post" enctype="multipart/form-data">
+                                <form onsubmit="return passwordValidation()" action="{% url 'Save_college' %}" method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="form-body">
                                         <div class="row">
@@ -24,8 +24,15 @@
                                                     <input type="text" class="form-control" placeholder="Head of Department" name="hod" required><br>
                                                 </div>
                                                 <br><h4 class="card-title">Add User Details</h4><br>
-                                                <input type="text" class="form-control" placeholder="Username" name="college_uname"><br>
-                                                <input type="password" class="form-control" placeholder="Password" name="college_pswd"><br>
+                                                <div style="position:relative; width:250px;">
+                                                <input onblur="checkUsername()" id="name" type="text" class="form-control" placeholder="Username" name="college_uname" required>
+                                                <span id="nameError" style="color:red;"></span><br>
+                                                </div>
+                                                <div style="position:relative; width:250px;">
+                                                <input id="pass" type="password" class="form-control" placeholder="Password" name="college_pswd">
+                                                <span onclick="togglePassword()" style="position:absolute;right:10px;top:25%;transform:translate(-50%);cursor:pointer;"><i class="icon-eye"></i></span>
+                                                </div>
+                                                <span id="passError" style="color:red;"></span><br>
                                             </div>
                                         </div>
                                     </div>
@@ -39,6 +46,44 @@
                             </div>
                         </div>
                     </div>
+<script>
+        function passwordValidation(){
+            pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
+            let pass = document.getElementById("pass").value;
+            let passError = document.getElementById("passError");
+            if (!pattern.test(pass)){
+                passError.innerText = "Password must have uppercase, lowercase, numbers, special characters and minimum of 8 characters";
+                return false;
+            }
+            passError.innerText = "";
+            return true;
+        }
+        function checkUsername(){
+            let username = document.getElementById("name").value;
+            let error = document.getElementById("nameError");
+            if (username.trim() === ""){
+                error.innerText = "Username Cannot be Empty";
+                return;
+            }
+            fetch("/AdminPanel/check_username/?username=" + encodeURIComponent(username))
+                .then(res => res.json())
+                .then(data =>{
+                    if (data.exists){
+                        error.innerText = "User already exists";
+                    }else{
+                        error.innerText = "";
+                    }
+                });
+        }
+        function togglePassword(){
+         let password = document.getElementById("pass");
+         if (password.type == "password"){
+            password.type = "text";
+         }else{
+            password.type = "password";
+         }
+        }
+    </script>
 </body>
 </html>
 {% endblock %}

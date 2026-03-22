@@ -71,7 +71,7 @@
     {% for m in messages %}
         Swal.fire({
             icon: "{{ m.tags }}",
-            title: "{{ m }}",
+            text: "{{ m }}",
             timer:3000,
             showConfirmButton: false
         });
@@ -81,7 +81,7 @@
     <script>
         function confirmDelete(url){
             Swal.fire({
-                title: "Are you sure?",
+                text: "Are you sure?",
                 icon: "warning",
                 showCancelButton: true,
             }).then((result) => {

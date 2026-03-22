@@ -80,7 +80,7 @@
     {% for m in messages %}
         Swal.fire({
             icon: "{{ m.tags }}",
-            title: "{{ m }}",
+            text: "{{ m }}",
             timer:3000,
             showConfirmButton: false
         });

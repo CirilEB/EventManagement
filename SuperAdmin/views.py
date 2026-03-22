@@ -7,7 +7,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import EmailMessage
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.files.storage import FileSystemStorage
@@ -62,6 +62,10 @@ def SuperAdminPanel(request):
     })
 def AddCollege(request):
     return render(request,'add_college.html')
+def check_username(request):
+    username = request.GET.get('username')
+    exists = DepartmentDb.objects.filter(cuname=username).exists()
+    return JsonResponse({'exists':exists})
 def ViewCollege(request):
     college = DepartmentDb.objects.all()
     return render(request,'view_college.html',{'college':college})
@@ -113,9 +117,10 @@ def admin_login(request):
             login(request, user)
             request.session['username'] = uname
             request.session['password'] = pswd
+            messages.success(request,"Logged in Successfully")
             return redirect(SuperAdminPanel)
         else:
-            print("Invalid Details..!")
+            messages.error(request,"Unknown Credentials !")
             return redirect(login_page)
     #department admin if
     elif DepartmentDb.objects.filter(cuname=uname, cpswd=pswd).exists():
@@ -123,14 +128,17 @@ def admin_login(request):
         request.session['username'] = uname
         request.session['password'] = pswd
         request.session['department'] = dept.code
+        messages.success(request, "Logged in Successfully")
         return redirect(CollegeAdminPanel)
     else:
         print("User not found..!")
+        messages.error(request, "Unknown Credentials !")
         return redirect(login_page)
 
 def admin_logout(request):
     del request.session['username']
     del request.session['password']
+    messages.success(request, "Logged out Successfully")
     return redirect(login_page)
 
 def CollegeAdminPanel(request):
@@ -275,7 +283,11 @@ def save_positions(request):
     event.qr_y = data["qr_y"]
 
     event.save()
-    return HttpResponse(status=204)
+    messages.success(request,"Positions Saved Successfully")
+    return JsonResponse({
+        "status":"success",
+        "message":"Positions Saved Successfully"
+    })
 
 
 
@@ -362,7 +374,10 @@ def process_qr(request):
         )
         email.send()
 
-        return HttpResponse(status=204)
+        return JsonResponse({
+            "status":"success",
+            "message":"Scanned Successfully"
+        })
 
 
 

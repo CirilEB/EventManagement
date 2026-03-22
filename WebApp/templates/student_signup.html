@@ -49,22 +49,25 @@
                     <div class="p-3">
                         <img src="{% static 'Super/assets/images/big/icon.png' %}" alt="wrapkit">
                         <h2 class="mt-3 text-center">Sign Up for Free</h2>
-                        <form class="mt-4" method="post" action="{% url 'save_signup' %}">
+                        <form class="mt-4" method="post" onsubmit="return passwordValidation()" action="{% url 'save_signup' %}">
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input class="form-control" type="text" placeholder="your name" name="student_name">
+                                        <input id="name" class="form-control" type="text" placeholder="your name" name="student_name" onblur="checkUsername()" required>
+                                        <span id="nameError" style="color:red;"></span>
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input class="form-control" type="email" placeholder="email address" name="student_email">
+                                        <input class="form-control" type="email" placeholder="email address" name="student_email" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input class="form-control" type="password" placeholder="password" name="student_pass">
+                                        <input id="pass" class="form-control" type="password" placeholder="password" name="student_pass">
+                                        <span onclick="togglePassword()" style="position:absolute;right:15px;top:18%;transform:translate(-50%);cursor:pointer;"><i class="icon-eye"></i></span>
+                                        <span id="passError" style="color:red;"></span>
                                     </div>
                                 </div>
                                 <div class="col-lg-12 text-center">
@@ -93,13 +96,51 @@
     {% for m in messages %}
         Swal.fire({
             icon: "{{ m.tags }}",
-            title: "{{ m }}",
+            text: "{{ m }}",
             timer:3000,
             showConfirmButton: false
         });
     {% endfor %}
     </script>
     {% endif %}
+    <script>
+        function passwordValidation(){
+            pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&#])[A-Za-z\d@$!%?&#]{8,}$/;
+            let pass = document.getElementById("pass").value;
+            let passError = document.getElementById("passError");
+            if (!pattern.test(pass)){
+                passError.innerText = "Password must have uppercase, lowercase, numbers, special characters and minimum of 8 characters";
+                return false;
+            }
+            passError.innerText = "";
+            return true;
+        }
+        function checkUsername(){
+            let username = document.getElementById("name").value;
+            let error = document.getElementById("nameError");
+            if (username.trim() === ""){
+                error.innerText = "Username Cannot be Empty";
+                return;
+            }
+            fetch("/EventRegister/check_username/?username=" + encodeURIComponent(username))
+                .then(res => res.json())
+                .then(data =>{
+                    if (data.exists){
+                        error.innerText = "User already exists";
+                    }else{
+                        error.innerText = "";
+                    }
+                });
+        }
+        function togglePassword(){
+         let password = document.getElementById("pass");
+         if (password.type == "password"){
+            password.type = "text";
+         }else{
+            password.type = "password";
+         }
+        }
+    </script>
     <script src="{% static 'Super/assets/libs/jquery/dist/jquery.min.js' %} "></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="{% static 'Super/assets/libs/popper.js/dist/umd/popper.min.js' %} "></script>
