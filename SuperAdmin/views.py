@@ -260,6 +260,7 @@ def student_registrations(request,viewreg_id):
 def delete_register(request,delete_id):
     registered = RegistrationDb.objects.filter(id=delete_id)
     registered.delete()
+    messages.success(request,"Registration Deleted Successfully")
     return redirect(college_registered_events)
 
 
@@ -283,7 +284,6 @@ def save_positions(request):
     event.qr_y = data["qr_y"]
 
     event.save()
-    messages.success(request,"Positions Saved Successfully")
     return JsonResponse({
         "status":"success",
         "message":"Positions Saved Successfully"
@@ -378,6 +378,74 @@ def process_qr(request):
             "status":"success",
             "message":"Scanned Successfully"
         })
+def presentOffline(request,stud_id):
+    RegistrationDb.objects.filter(id=stud_id).update(sattendance="Present",pay_status="Paid",razorpay_order_id="Payment by cash")
+    student = RegistrationDb.objects.get(id=stud_id)
+    s_event = student.event_name
+    s_name = student.sname
+    s_email = student.semail
+
+    # certificate generation
+    event = EventDb.objects.filter(title=s_event).first()
+    img = Image.open(event.certificate.path)
+    img_width, img_height = img.size
+    dispaly_width = 500
+    scale = img_width / dispaly_width
+
+    name_x = int(event.name_x * scale)
+    name_y = int(event.name_y * scale)
+    event_x = int(event.event_x * scale)
+    event_y = int(event.event_y * scale)
+    date_x = int(event.date_x * scale)
+    date_y = int(event.date_y * scale)
+    qr_x = int(event.qr_x * scale)
+    qr_y = int(event.qr_y * scale)
+
+    base_font_size = 20
+    font_size = int(base_font_size * scale)
+    font = ImageFont.truetype("arial.ttf", font_size)
+
+    reg = RegistrationDb.objects.get(sname=s_name, event_name=s_event)
+    qr_img = Image.open(reg.qr_image.path).convert("RGB")
+    base_qr_size = 80
+    qr_size = int(base_qr_size * scale)
+    qr_img = qr_img.resize((qr_size, qr_size), Image.NEAREST)
+    img.paste(qr_img, (qr_x, qr_y))
+
+    draw = ImageDraw.Draw(img)
+
+    # text_bbox = draw.textbbox((0,0), event.title, font=font)
+    # text_width = text_bbox[2] - text_bbox[0]
+    # center_x_event = (img_width - text_width) // 2
+
+    draw.text((name_x, name_y), s_name, fill="black", font=font)
+    draw.text((event_x, event_y), event.title, fill="black", font=font)
+    draw.text((date_x, date_y), str(event.start), fill="black", font=font)
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    filename = f"{s_name}_{s_event}.png"
+    reg.certificate_image.save(
+        filename,
+        ContentFile(buffer.getvalue()),
+        save=True
+    )
+
+    email = EmailMessage(
+        subject=event.title,
+        body="Thank you for participating our program, your certificate is attached with this email.For any issues, contact to our website.",
+        from_email="cirileb2003@gmail.com",
+        to=[s_email]
+    )
+    email.attach(
+        filename,
+        buffer.getvalue(),
+        "image/png"
+    )
+    email.send()
+    messages.success(request,"Attendance Marked Successfully")
+    return redirect(college_registered_events)
+
 
 
 

@@ -27,5 +27,6 @@ urlpatterns=[
     path('process-qr/',views.process_qr,name='process_qr'),
     path('certificate_editor/<int:e_certi>/',views.certificate_editor,name='certificate_editor'),
     path('save-positions/',views.save_positions,name='save_positions'),
-    path('check_username/',views.check_username,name='check_username')
+    path('check_username/',views.check_username,name='check_username'),
+    path('presentOffline/<int:stud_id>/',views.presentOffline,name='presentOffline')
 ]
