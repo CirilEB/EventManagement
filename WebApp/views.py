@@ -49,9 +49,13 @@ def Events(request):
 def Register(request,event_id):
     alldepartments = DepartmentDb.objects.all()
     register = EventDb.objects.get(id=event_id)
+    today = timezone.now().date()
+    total_reg = RegistrationDb.objects.filter(event_name=register.title).count()
     return render(request,'Register.html',{
         'register':register,
-        'alldepartments':alldepartments
+        'alldepartments':alldepartments,
+        'today':today,
+        'total_reg':total_reg
     })
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()

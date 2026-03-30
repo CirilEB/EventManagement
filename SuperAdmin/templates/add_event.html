@@ -45,19 +45,19 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Start Date</label>
-                                                    <input type="date" class="form-control" name="start" required>
+                                                    <input type="date" id="start" class="form-control" name="start" required onchange="setEndMin(); setDeadlineMax();">
                                                 </div>
                                             </div>
                                              <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>End Date</label>
-                                                    <input type="date" class="form-control" name="end" required>
+                                                    <input type="date" id="end" class="form-control" name="end" required onchange="setStartMax();">
                                                 </div>
                                             </div>
                                              <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Registration Dead Line</label>
-                                                    <input type="date" class="form-control" name="dead" required>
+                                                    <input type="date" id="deadline" class="form-control" name="dead" required onchange="setStartMin(); setEndMin();">
                                                 </div>
                                             </div>
                                         </div>
@@ -111,6 +111,30 @@
                             </div>
                         </div>
                     </div>
+    <script>
+        window.onload = function(){
+            let today = new Date().toISOString().split("T")[0];
+            document.getElementById("deadline").min = today;
+            document.getElementById("start").min = today;
+            document.getElementById("end").min = today;
+        };
+        function setStartMin(){
+            let deadline = document.getElementById("deadline").value;
+            document.getElementById("start").min = deadline;
+        }
+        function setEndMin(){
+            let start = document.getElementById("start").value;
+            document.getElementById("end").min = start;
+        }
+        function setDeadlineMax(){
+            let start = document.getElementById("start").value;
+            document.getElementById("deadline").max = start;
+        }
+        function setStartMax(){
+            let end = document.getElementById("end").value;
+            document.getElementById("start").max = end;
+        }
+    </script>
 </body>
 </html>
 {% endblock %}

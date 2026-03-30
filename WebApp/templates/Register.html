@@ -125,6 +125,9 @@
                             <img src="{{ register.poster.url }}" alt="" style="height:500px;"><br><br>
                             <p>{{ register.description }}</p>
                             {% if request.session.Logname %}
+                            {% if register.dead < today or total_reg >= register.maxS %}
+                            <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Oops..! Registration closed due to deadline or maximum participants</h6>
+                            {% else %}
                             <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">If you want to participate, fill this form and click "register now"</h6>
                             <br><br>
                             <form action="{% url 'Save_registration' %}" method="post">
@@ -144,6 +147,7 @@
                                         <input type="text" name="smob" id="" class="form-control" placeholder="Mobile Number"><br>
                                     </div>
                                 </div>
+                                {% endif %}
                                 {% else %}
                                 <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">If you want to register, please sign in now</h6>
                                 {% endif %}

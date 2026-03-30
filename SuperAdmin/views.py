@@ -242,8 +242,10 @@ def event_approval(request,approval_id):
         messages.success(request,"Event Approved Successfully")
         return redirect(all_event)
 def delete_event(request,delete_id):
-    event = EventDb.objects.filter(id=delete_id)
+    event = EventDb.objects.get(id=delete_id)
+    registrations = RegistrationDb.objects.filter(event_name=event.title)
     event.delete()
+    registrations.delete()
     messages.success(request,"Event Deleted Successfully")
     return redirect(view_event)
 
