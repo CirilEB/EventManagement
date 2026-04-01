@@ -448,6 +448,18 @@ def presentOffline(request,stud_id):
     messages.success(request,"Attendance Marked Successfully")
     return redirect(college_registered_events)
 
+def archived_events(request):
+    uname = request.session.get('department')
+    event = EventDb.objects.filter(euname=uname)
+    return render(request,'archived_events.html',{'event':event})
+def archiveSuccess(request,archive_id):
+    EventDb.objects.filter(id=archive_id).update(is_archived=True)
+    messages.success(request,"Archived Successfully")
+    return redirect(college_registered_events)
+def Unarchive(request,archive_id):
+    EventDb.objects.filter(id=archive_id).update(is_archived=False)
+    messages.success(request,"Unarchived Successfully")
+    return redirect(archived_events)
 
 
 

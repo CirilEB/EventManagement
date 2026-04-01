@@ -41,9 +41,11 @@ def Contact(request):
     return render(request,'Contact.html',{'alldepartments':alldepartments})
 def Events(request):
     alldepartments = DepartmentDb.objects.all()
-    Allevents = EventDb.objects.all()
+    Completed = EventDb.objects.filter(is_archived=True)
+    Current = EventDb.objects.filter(is_archived=False)
     return render(request,'Events.html',{
-        'Allevents':Allevents,
+        'Completed':Completed,
+        'Current':Current,
         'alldepartments':alldepartments
     })
 def Register(request,event_id):

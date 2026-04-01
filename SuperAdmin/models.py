@@ -13,6 +13,7 @@ class DepartmentDb(models.Model):
         return self.name
 
 class EventDb(models.Model):
+    is_archived = models.BooleanField(default=False)
     euname = models.CharField(max_length=50,default="")
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=300)

@@ -11,7 +11,7 @@
     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">All Active Events</h4><br>
+                                <h4 class="card-title">Archived Events</h4><br>
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead class="bg-info text-white">
@@ -22,13 +22,12 @@
                                         </thead>
                                         <tbody>
                                         {% for i in event %}
-                                        {% if i.is_archived == False %}
+                                        {% if i.is_archived == True %}
                                         <tr>
                                             <td>{{ i.title }}</td>
                                             <td>
-                                                <a href="{% url 'student_registrations' viewreg_id=i.id %}" class="btn btn-primary">View Registrations</a>&nbsp;&nbsp;&nbsp;
-                                                <a href="{% url 'certificate_editor' e_certi=i.id %}" class="btn btn-warning">Certificate Editor</a>&nbsp;&nbsp;&nbsp;
-                                                <a onclick="confirmDelete('{% url 'archiveSuccess' archive_id=i.id %}')" href="#" class="btn btn-success">Add to archive</a>
+                                                <a class="btn btn-primary text-white">Download Report</a>&nbsp;&nbsp;&nbsp;
+                                                <a onclick="confirmDelete('{% url 'Unarchive' archive_id=i.id %}')" class="btn btn-danger text-white">Unarchive</a>
                                             </td>
                                         </tr>
                                         {% endif %}

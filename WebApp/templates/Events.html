@@ -27,6 +27,21 @@
 </head>
 
 <body>
+<style>
+    .tab-link{
+        padding:8px;
+        cursor: pointer;
+        position: relative;
+        font-weight: 500;
+        color: #555;
+    }.tab-link.active{
+        color: white;
+        background-color:#ff6363;
+        border-radius:8px;
+    }.hidden{
+        display:none;
+    }
+</style>
     <!-- Topbar Start -->
     <div class="container-fluid bg-primary">
         <div class="row py-2 px-lg-5">
@@ -65,7 +80,7 @@
     <div class="container-fluid p-0">
         <nav class="navbar navbar-expand-lg bg-white navbar-light py-3 py-lg-0 px-lg-5">
             <a href="index.html" class="navbar-brand ml-lg-3">
-                <h1 class="m-0 text-uppercase text-info"><img src="{% static 'Web/img/ESEC_Logo.webp' %}" width="70px">&nbsp;ESEC Event Portal</h1>
+                <h1 class="m-0 text-uppercase text-info"><img src="{% static 'Web/img/ESEC_Logo.webp' %}" width="70px">&nbsp;ESEC</h1>
             </a>
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -117,17 +132,30 @@
             <div class="row mx-0 justify-content-center">
                 <div class="col-lg-8">
                     <div class="section-title text-center position-relative mb-5">
-                        <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">All Events</h6>
-                        <h1 class="display-4">Register Now</h1>
+                        <h6 id="eventhead1" class="d-inline-block position-relative text-secondary text-uppercase pb-2">All Events</h6>
+                        <h1 id="eventhead2" class="display-4">Register Now</h1>
                     </div>
                 </div>
             </div>
             <div class="row">
-                {% for i in Allevents %}
+                <div class="col-md-12">
+                    <div class="d-flex" style="gap:25px;border-bottom:2px solid #ddd;margin-bottom:15px;justify-content:center;">
+                        <h5 class="tab-link active" onclick="switchTab('current',event)">
+                            Current Events
+                        </h5>
+                        <h5 class="tab-link" onclick="switchTab('completed',event)">
+                            Completed Events
+                        </h5>
+                    </div>
+                </div>
+            </div>
+            <div id="current" class="tab-content">
+                <div class="row">
+                {% for i in Current %}
                 {% if i.status == "Approved" %}
-                <div class="col-lg-4 col-md-6 pb-4">
+                <div class="col-md-4 pb-4 h-100">
                     <a class="courses-list-item position-relative d-block overflow-hidden mb-2" href="{% url 'Register' event_id=i.id %}">
-                        <img class="img-fluid" src="{{ i.poster.url }}" alt="">
+                        <img class="img-fluid" style="height:350px;width:500px" src="{{ i.poster.url }}" alt="">
                         <div class="courses-text">
                             <h4 class="text-center text-white px-3">{{ i.title }}</h4>
                             <h6 class="text-center text-white px-3">{{ i.euname }}</h6>
@@ -143,26 +171,30 @@
                 </div>
                 {% endif %}
                 {% endfor %}
-                <div class="col-12">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-lg justify-content-center mb-0">
-                          <li class="page-item disabled">
-                            <a class="page-link rounded-0" href="#" aria-label="Previous">
-                              <span aria-hidden="true">&laquo;</span>
-                              <span class="sr-only">Previous</span>
-                            </a>
-                          </li>
-                          <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item">
-                            <a class="page-link rounded-0" href="#" aria-label="Next">
-                              <span aria-hidden="true">&raquo;</span>
-                              <span class="sr-only">Next</span>
-                            </a>
-                          </li>
-                        </ul>
-                      </nav>
+                </div>
+            </div>
+            <div id="completed" class="tab-content hidden">
+                <div class="row">
+                {% for i in Completed %}
+                {% if i.status == "Approved" %}
+                <div class="col-lg-4 col-md-6 pb-4 h-100">
+                    <a class="courses-list-item position-relative d-block overflow-hidden mb-2" href="{% url 'Register' event_id=i.id %}">
+                        <img class="img-fluid" style="height:350px;width:500px" src="{{ i.poster.url }}" alt="">
+                        <div class="courses-text">
+                            <h4 class="text-center text-white px-3">{{ i.title }}</h4>
+                            <h6 class="text-center text-white px-3">{{ i.euname }}</h6>
+                            <div class="border-top w-100 mt-3">
+                                <div class="d-flex justify-content-between p-4">
+                                    <span class="text-white">{{ i.type }}</span>
+                                    <span class="text-white">Rs.
+                                        <small>{{ i.fee }}</small></span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                {% endfor %}
                 </div>
             </div>
         </div>
@@ -250,6 +282,25 @@
 
 
     <!-- JavaScript Libraries -->
+    <script>
+        function switchTab(tabId,event){
+            if (event) event.preventDefault();
+            document.getElementById("current").classList.add("hidden");
+            document.getElementById("completed").classList.add("hidden");
+            document.getElementById(tabId).classList.remove("hidden");
+            let heading = document.getElementById("eventhead2");
+            if (tabId == "current"){
+                heading.innerText = "Register Now"
+            }else{
+                heading.innerText = "Check Comments"
+            }
+
+            document.querySelectorAll('.tab-link').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            if (event) event.target.classList.add('active');
+        }
+    </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'Web/lib/easing/easing.min.js' %}"></script>

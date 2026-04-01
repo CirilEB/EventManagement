@@ -28,5 +28,8 @@ urlpatterns=[
     path('certificate_editor/<int:e_certi>/',views.certificate_editor,name='certificate_editor'),
     path('save-positions/',views.save_positions,name='save_positions'),
     path('check_username/',views.check_username,name='check_username'),
-    path('presentOffline/<int:stud_id>/',views.presentOffline,name='presentOffline')
+    path('presentOffline/<int:stud_id>/',views.presentOffline,name='presentOffline'),
+    path('archived_events/',views.archived_events,name='archived_events'),
+    path('archiveSuccess/<int:archive_id>/',views.archiveSuccess,name='archiveSuccess'),
+    path('Unarchive/<int:archive_id>/',views.Unarchive,name='Unarchive')
 ]
