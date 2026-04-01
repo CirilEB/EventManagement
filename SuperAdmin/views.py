@@ -1,5 +1,12 @@
 import json
 import os
+import zipfile
+from openpyxl import Workbook
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Image as reportImg,Table,TableStyle
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
 from django.contrib import messages
 from django.db.models import Sum,Count,Q
 from io import BytesIO
@@ -460,6 +467,147 @@ def Unarchive(request,archive_id):
     EventDb.objects.filter(id=archive_id).update(is_archived=False)
     messages.success(request,"Unarchived Successfully")
     return redirect(archived_events)
+
+def zipDownload(request,download_id):
+    event = EventDb.objects.get(id=download_id)
+    dept = DepartmentDb.objects.get(code=event.euname)
+    registrations = RegistrationDb.objects.filter(event_name=event.title,dept_name=event.euname)
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer,'w') as zip_file:
+        #Excel with student details
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Students"
+        ws.append(["Name","Email","College","Department","Year","Mobile","Payment Method","Payment Status","Attendance"])
+        for i in registrations:
+            ws.append([
+                i.sname,
+                i.semail,
+                i.scollege,
+                i.sdept,
+                i.syear,
+                i.smob,
+                i.razorpay_order_id,
+                i.pay_status,
+                i.sattendance
+            ])
+        ws.column_dimensions['A'].width = 20
+        ws.column_dimensions['B'].width = 20
+        ws.column_dimensions['C'].width = 20
+        ws.column_dimensions['D'].width = 20
+        ws.column_dimensions['E'].width = 20
+        ws.column_dimensions['F'].width = 20
+        ws.column_dimensions['G'].width = 20
+        ws.column_dimensions['H'].width = 20
+        ws.column_dimensions['I'].width = 20
+        excel_buffer = BytesIO()
+        wb.save(excel_buffer)
+
+        #Student Certififcates
+        for i in registrations:
+            if i.certificate_image and os.path.exists(i.certificate_image.path):
+                file_path = i.certificate_image.path
+                file_name = os.path.basename(file_path)
+
+                zip_file.write(
+                    file_path,
+                    arcname=f"{event.title}_{event.euname}/certificates/{file_name}"
+                )
+
+        #Event Report PDF
+        report_buffer = BytesIO()
+        doc = SimpleDocTemplate(report_buffer,pagesize=A4)
+        styles = getSampleStyleSheet()
+        elements = []
+
+        logo_path = os.path.join(settings.BASE_DIR,"SuperAdmin/static/Super/assets/images/ESEC_Logo.jpg")
+        logo = reportImg(logo_path,width=1*inch,height=1*inch)
+        college_name = Paragraph(
+            "<b>ERODE SENGUNTHAR ENGINEERING COLLEGE (AUTONOMOUS)</b>",
+            styles['Title']
+        )
+        header_table = Table([[logo,college_name]],colWidths=[1.5*inch,4.5*inch])
+        elements.append(header_table)
+        elements.append(Spacer(1,10))
+        line = Table([[""]],colWidths=[6*inch])
+        line.setStyle(TableStyle([
+            ('LINEBELOW',(0,0),(-1,-1),1,colors.black)
+        ]))
+        elements.append(line)
+        elements.append(Spacer(1,15))
+        elements.append(Paragraph("<b>Event Details</b>",styles['Heading2']))
+        elements.append(Spacer(1,10))
+        details = [
+            f"Department            : {dept.name}",
+            f"Event Name            : {event.title}",
+            f"Event Type            : {event.type}",
+            f"Mode                  : {event.mode}",
+            f"Start Date            : {event.start}",
+            f"End Date              : {event.end}",
+            f"Venue                 : {event.location}",
+            f"Fee per registration  : {event.fee}"
+        ]
+        for i in details:
+            elements.append(Paragraph(f"• {i}",styles['Normal']))
+        elements.append(Spacer(1,10))
+        elements.append(Paragraph("<b>Description</b>",styles['Heading3']))
+        elements.append(Paragraph(event.description,styles['Normal']))
+        elements.append(Spacer(1,15))
+        total = registrations.count()
+        attended = registrations.filter(sattendance="Present").count()
+        absent = total - attended
+        revenue = registrations.filter(pay_status="Paid").aggregate(
+            total=Sum("fee")
+        )["total"] or 0
+        elements.append(Paragraph("<b>Event Analytics</b>",styles['Heading2']))
+        elements.append(Spacer(1,10))
+        analytics_data = [
+            ["Metric","Value"],
+            ["Total Registrations",total],
+            ["Present Count",attended],
+            ["Absent Count",absent],
+            ["Revenue Generated",f"Rs.{revenue}"]
+        ]
+        table = Table(analytics_data,colWidths=[3*inch,3*inch])
+        table.setStyle(TableStyle([
+            ('GRID',(0,0),(-1,-1),1,colors.black),
+            ('BACKGROUND',(0,0),(-1,0),colors.lightgrey)
+        ]))
+        elements.append(table)
+        elements.append(Spacer(1,20))
+        if event.conclude:
+            elements.append(Paragraph("<b>Conclusion</b>",styles['Heading2']))
+            elements.append(Paragraph(event.conclude,styles['Normal']))
+        doc.build(elements)
+        pdf = report_buffer.getvalue()
+        report_buffer.close()
+
+        zip_file.writestr(
+            f"{event.title}_{event.euname}/report.pdf",
+            pdf
+        )
+        zip_file.writestr(
+            f"{event.title}_{event.euname}/data/student_registrations.xlsx",
+            excel_buffer.getvalue()
+        )
+        zip_file.writestr(
+            f"{event.title}_{event.euname}/info.txt",
+            "ZIP downloaded without errors!"
+        )
+    response = HttpResponse(buffer.getvalue(),content_type='application/zip')
+    response['Content-Disposition'] = f'attachment;filename={event.title}_{event.euname}.zip'
+
+    return response
+def AddConclusion(request,event_id):
+    data = EventDb.objects.get(id=event_id)
+    return render(request,'add_conclusion.html',{'data':data})
+def Save_conclude(request,event_id):
+    uname = request.session.get('department')
+    if request.method == "POST":
+        conclude = request.POST.get('conclude')
+        EventDb.objects.filter(id=event_id,euname=uname).update(conclude=conclude)
+        messages.success(request,"Conclusion Added to Report")
+        return redirect(archived_events)
 
 
 

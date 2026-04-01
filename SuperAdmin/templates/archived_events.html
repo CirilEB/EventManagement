@@ -26,8 +26,9 @@
                                         <tr>
                                             <td>{{ i.title }}</td>
                                             <td>
-                                                <a class="btn btn-primary text-white">Download Report</a>&nbsp;&nbsp;&nbsp;
-                                                <a onclick="confirmDelete('{% url 'Unarchive' archive_id=i.id %}')" class="btn btn-danger text-white">Unarchive</a>
+                                                <a href="{% url 'zipDownload' download_id=i.id %}" class="btn btn-primary text-white">Download Report</a>&nbsp;&nbsp;&nbsp;
+                                                <a onclick="confirmDelete('{% url 'Unarchive' archive_id=i.id %}')" class="btn btn-danger text-white">Unarchive</a>&nbsp;&nbsp;&nbsp;
+                                                <a href="{% url 'AddConclusion' event_id=i.id %}" class="btn btn-success text-white">Add Conclusion</a>
                                             </td>
                                         </tr>
                                         {% endif %}

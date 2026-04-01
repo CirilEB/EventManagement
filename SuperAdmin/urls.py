@@ -31,5 +31,8 @@ urlpatterns=[
     path('presentOffline/<int:stud_id>/',views.presentOffline,name='presentOffline'),
     path('archived_events/',views.archived_events,name='archived_events'),
     path('archiveSuccess/<int:archive_id>/',views.archiveSuccess,name='archiveSuccess'),
-    path('Unarchive/<int:archive_id>/',views.Unarchive,name='Unarchive')
+    path('Unarchive/<int:archive_id>/',views.Unarchive,name='Unarchive'),
+    path('zipDownload/<int:download_id>/',views.zipDownload,name='zipDownload'),
+    path('AddConclusion/<int:event_id>/',views.AddConclusion,name='AddConclusion'),
+    path('Save_conclude/<int:event_id>/',views.Save_conclude,name='Save_conclude')
 ]
