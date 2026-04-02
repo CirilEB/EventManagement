@@ -22,5 +22,9 @@ urlpatterns=[
     path('Payment/<int:stud_id>/',views.Payment,name='Payment'),
     path('verify_payment',views.verify_payment,name='verify_payment'),
     path('check_username/',views.check_username,name='check_username'),
-    path('review/<int:regId>/',views.submit_review,name='submit_review')
+    path('review/<int:regId>/',views.submit_review,name='submit_review'),
+    path('ForgotPassword/',views.ForgotPassword,name='ForgotPassword'),
+    path('submit_forgot',views.submit_forgot,name='submit_forgot'),
+    path('check_otp_pass',views.check_otp_pass,name='check_otp_pass'),
+    path('verify_otp_forgot/',views.verify_otp_forgot,name='verify_otp_forgot')
 ]

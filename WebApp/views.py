@@ -15,6 +15,7 @@ from django.core.mail import EmailMessage
 from SuperAdmin.models import EventDb, DepartmentDb
 from WebApp.models import RegistrationDb, StudentDb
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password,check_password
 
 
 # Create your views here.
@@ -224,7 +225,8 @@ def save_signup(request):
     if request.method == "POST":
         student_name = request.POST.get('student_name')
         student_email = request.POST.get('student_email')
-        student_pass = request.POST.get('student_pass')
+        student_pass_original = request.POST.get('student_pass')
+        student_pass = make_password(student_pass_original)
         otp = random.randint(100000,999999)
         obj = StudentDb(student_name=student_name,student_email=student_email,student_pass=student_pass,student_otp=otp)
         obj.save()
@@ -240,6 +242,8 @@ def save_signup(request):
         return redirect(verify_otp)
 def verify_otp(request):
     return render(request,'otp_verificationPage.html')
+def verify_otp_forgot(request):
+    return render(request, 'otp_verifyForgot.html')
 def check_otp(request):
     if request.method == "POST":
         entered_otp = request.POST.get('enterotp')
@@ -263,7 +267,8 @@ def login_check(request):
     if request.method == "POST":
         Lname = request.POST.get('name')
         Lpass = request.POST.get('pass')
-        if StudentDb.objects.filter(student_name=Lname,student_pass=Lpass).exists():
+        LogStudent = StudentDb.objects.filter(student_name=Lname).first()
+        if LogStudent and check_password(Lpass,LogStudent.student_pass):
             request.session['Logname'] = Lname
             messages.success(request,"Successfully Logged in")
             return redirect(Home)
@@ -283,3 +288,46 @@ def submit_review(request,regId):
         reg.save()
         messages.success(request,"Comment Added! Thank you for your Contribution")
         return redirect(MyRegistrations)
+
+def ForgotPassword(request):
+    return render(request,'Forgot_Password.html')
+def submit_forgot(request):
+    if request.method == "POST":
+        uname = request.POST.get('name')
+        pass_original = request.POST.get('pass')
+        pswd = make_password(pass_original)
+        otp = random.randint(100000, 999999)
+        LogStudent = StudentDb.objects.filter(student_name=uname).first()
+        StudentDb.objects.filter(student_name=uname).update(student_otp=otp,created_at=timezone.now())
+        request.session['student_name'] = uname
+        request.session['student_pass'] = pswd
+        email_message = EmailMessage(
+            subject="OTP Verification",
+            body="Your OTP to change your old password " + str(otp),
+            from_email="cirileb2003@gmail.com",
+            to=[LogStudent.student_email]
+        )
+        email_message.send()
+        return redirect(verify_otp_forgot)
+def check_otp_pass(request):
+    if request.method == "POST":
+        entered_otp = request.POST.get('enterotp')
+        student_name = request.session.get('student_name')
+        student_pass = request.session.get('student_pass')
+        student = StudentDb.objects.get(student_name=student_name)
+        del request.session['student_name']
+        del request.session['student_pass']
+        if timezone.now() > student.created_at + timedelta(minutes=2):
+            student.delete()
+            messages.error(request, "OTP Expired !")
+            return redirect(ForgotPassword)
+        if student.student_otp == entered_otp:
+            student.student_pass = student_pass
+            student.save()
+            messages.success(request,"OTP Verified and Password Changed!")
+            return redirect(student_loginPage)
+        else:
+            messages.error(request,"Incorrect OTP !")
+            student.delete()
+            return redirect(ForgotPassword)
+

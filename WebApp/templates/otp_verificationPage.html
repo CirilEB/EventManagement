@@ -49,6 +49,7 @@
                     <div class="p-3">
                         <img src="{% static 'Super/assets/images/big/icon.png' %}" alt="wrapkit">
                         <h2 class="mt-3 text-center">Verify Your Email</h2>
+                        <span>You have 5 minutes expiry time</span>
                         <form class="mt-4" method="post" action="{% url 'check_otp' %}">
                             {% csrf_token %}
                             <div class="row">

@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import  authenticate,login
 from django.views.decorators.csrf import csrf_exempt
 from WebApp.models import RegistrationDb
+from django.contrib.auth.hashers import make_password,check_password
 
 
 # Create your views here.
@@ -84,7 +85,8 @@ def Save_college(request):
         mobile = request.POST.get('mob')
         hod = request.POST.get('hod')
         cuname = request.POST.get('college_uname')
-        cpswd = request.POST.get('college_pswd')
+        cpswd_original = request.POST.get('college_pswd')
+        cpswd = make_password(cpswd_original)
         obj = DepartmentDb(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
         obj.save()
         messages.success(request,"Department Added Successfully")
@@ -105,7 +107,8 @@ def update_college(request,college_id):
         mobile = request.POST.get('mob')
         hod = request.POST.get('hod')
         cuname = request.POST.get('college_uname')
-        cpswd = request.POST.get('college_pswd')
+        cpswd_original = request.POST.get('college_pswd')
+        cpswd = make_password(cpswd_original)
         DepartmentDb.objects.filter(id=college_id).update(name=name,code=code,email=email,mob=mobile,hod=hod,cuname=cuname,cpswd=cpswd)
         messages.success(request,"Department Updated Successfully")
         return redirect(ViewCollege)
@@ -117,6 +120,7 @@ def admin_login(request):
     if request.method == "POST":
         uname = request.POST.get('username')
         pswd = request.POST.get('password')
+        DepartmentSet = DepartmentDb.objects.filter(cuname=uname).first()
     #college admin if
     if User.objects.filter(username__contains=uname).exists():
         user = authenticate(username=uname,password=pswd)
@@ -130,11 +134,10 @@ def admin_login(request):
             messages.error(request,"Unknown Credentials !")
             return redirect(login_page)
     #department admin if
-    elif DepartmentDb.objects.filter(cuname=uname, cpswd=pswd).exists():
-        dept = DepartmentDb.objects.filter(cuname=uname,cpswd=pswd).first()
+    elif DepartmentSet and check_password(pswd,DepartmentSet.cpswd):
         request.session['username'] = uname
         request.session['password'] = pswd
-        request.session['department'] = dept.code
+        request.session['department'] = DepartmentSet.code
         messages.success(request, "Logged in Successfully")
         return redirect(CollegeAdminPanel)
     else:

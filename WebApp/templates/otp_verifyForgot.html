@@ -42,38 +42,24 @@
         <!-- ============================================================== -->
         <div class="auth-wrapper d-flex no-block justify-content-center align-items-center position-relative"
             style="background:url({% static 'Super/assets/images/big/auth-bg.jpg' %}) no-repeat center center;">
-            <div class="auth-box row">
+            <div class="auth-box row text-center">
                 <div class="col-lg-7 col-md-5 modal-bg-img" style="background-image: url({% static 'Super/assets/images/big/3.jpg' %});">
                 </div>
                 <div class="col-lg-5 col-md-7 bg-white">
                     <div class="p-3">
-                        <div class="text-center">
-                            <img src="{% static 'Super/assets/images/big/icon.png' %}" alt="wrapkit">
-                        </div>
-                        <h2 class="mt-3 text-center">Log In</h2>
-                        <p class="text-center">Enter your username and password to access admin panel.</p>
-                        <form class="mt-4" method="post" action="{% url 'login_check' %}">
+                        <img src="{% static 'Super/assets/images/big/icon.png' %}" alt="wrapkit">
+                        <h2 class="mt-3 text-center">Verify Your Email</h2>
+                        <span>You have 2 minutes expiry time</span>
+                        <form class="mt-4" method="post" action="{% url 'check_otp_pass' %}">
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input class="form-control" id="uname" type="text"
-                                            placeholder="enter your name" name="name">
+                                        <input class="form-control" type="text" placeholder="Enter OTP" name="enterotp">
                                     </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <input class="form-control" id="pass" type="password"
-                                            placeholder="enter your password" name="pass">
-                                        <span onclick="togglePassword()" style="position:absolute;right:15px;top:18%;transform:translate(-50%);cursor:pointer;"><i class="icon-eye"></i></span>
-                                    </div>
-                                </div>
-                                <div class="ml-2 p-3">
-                                <a href="{% url 'ForgotPassword' %}">Forgot Password ?</a>
                                 </div>
                                 <div class="col-lg-12 text-center">
-                                    <button type="submit" class="btn btn-block btn-dark">Log In</button><br>
-                                    <p>New here?<a href="{% url 'student_signup' %}" class="text-danger"> Sign Up</a> </p>
+                                    <button type="submit" class="btn btn-block btn-dark">Verify</button><br>
                                 </div>
                             </div>
                         </form>
@@ -102,16 +88,6 @@
     {% endfor %}
     </script>
     {% endif %}
-    <script>
-        function togglePassword(){
-         let password = document.getElementById("pass");
-         if (password.type == "password"){
-            password.type = "text";
-         }else{
-            password.type = "password";
-         }
-        }
-    </script>
     <script src="{% static 'Super/assets/libs/jquery/dist/jquery.min.js' %} "></script>
     <!-- Bootstrap tether Core JavaScript -->
     <script src="{% static 'Super/assets/libs/popper.js/dist/umd/popper.min.js' %} "></script>
