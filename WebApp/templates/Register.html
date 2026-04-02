@@ -127,6 +127,75 @@
                             {% if request.session.Logname %}
                             {% if register.dead < today or total_reg >= register.maxS %}
                             <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Oops..! Registration closed due to deadline or maximum participants</h6>
+                            {% if register.is_archived == True %}
+                            <div>
+                                <div class="d-flex">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= avg_rating %}
+                                        <h4 style="color:gold;">★<h4>
+                                    {% else %}
+                                        <h4 style="color:gray;">★<h4>
+                                    {% endif %}
+                                {% endfor %}&nbsp;&nbsp;
+                                <h4>{{ avg_rating }}/5</h4>
+                                </div>
+                                <p>{{ reviews.count }} Reviews</p>
+                            </div>
+                            {% for review in reviews %}
+                            <div class="card mb-3 p-3">
+                                <strong>{{ review.sname }}</strong>
+                                <div>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <span style="color:gold;">★<span>
+                                    {% else %}
+                                        <span style="color:gray;">★<span>
+                                    {% endif %}
+                                {% endfor %}
+                                </div><br>
+                                <p>{{ review.comment }}</p>
+                                <small>{{ review.commented_at }}</small>
+                            </div>
+                            {% empty %}
+                            <p>No reviews yet</p>
+                            {% endfor %}
+                            {% else %}
+                            <p>Your comments will be shown here after event completion</p>
+                            {% endif %}
+                            {% else %}
+                            {% if register.is_archived == True %}
+                            <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">Event closed by department admin</h6>
+                            <div>
+                                <div class="d-flex">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= avg_rating %}
+                                        <h4 style="color:gold;">★<h4>
+                                    {% else %}
+                                        <h4 style="color:gray;">★<h4>
+                                    {% endif %}
+                                {% endfor %}&nbsp;&nbsp;
+                                <h4>{{ avg_rating }}/5</h4>
+                                </div>
+                                <p>{{ reviews.count }} Reviews</p>
+                            </div>
+                            {% for review in reviews %}
+                            <div class="card mb-3 p-3">
+                                <strong>{{ review.sname }}</strong>
+                                <div>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <span style="color:gold;">★<span>
+                                    {% else %}
+                                        <span style="color:gray;">★<span>
+                                    {% endif %}
+                                {% endfor %}
+                                </div><br>
+                                <p>{{ review.comment }}</p>
+                                <small>{{ review.commented_at }}</small>
+                            </div>
+                            {% empty %}
+                            <p>No reviews yet</p>
+                            {% endfor %}
                             {% else %}
                             <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">If you want to participate, fill this form and click "register now"</h6>
                             <br><br>
@@ -147,6 +216,7 @@
                                         <input type="text" name="smob" id="" class="form-control" placeholder="Mobile Number"><br>
                                     </div>
                                 </div>
+                                {% endif %}
                                 {% endif %}
                                 {% else %}
                                 <h6 class="d-inline-block position-relative text-secondary text-uppercase pb-2">If you want to register, please sign in now</h6>

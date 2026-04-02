@@ -19,6 +19,11 @@ class RegistrationDb(models.Model):
     qr_image = models.ImageField(upload_to="student_qr",null=True,blank=True)
     certificate_image = models.ImageField(upload_to="Students_Certificates",null=True,blank=True)
 
+    #review fields
+    rating = models.IntegerField(null=True,blank=True)
+    comment = models.TextField(max_length=200,null=True,blank=True)
+    commented_at = models.DateTimeField(null=True,blank=True)
+
 class StudentDb(models.Model):
     student_name = models.CharField(max_length=50)
     student_email = models.EmailField()

@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
+from django.db.models import Avg
 import json
 import qrcode
 import random
@@ -53,11 +54,15 @@ def Register(request,event_id):
     register = EventDb.objects.get(id=event_id)
     today = timezone.now().date()
     total_reg = RegistrationDb.objects.filter(event_name=register.title).count()
+    reviews = RegistrationDb.objects.filter(event_name=register.title,rating__isnull=False).order_by('-commented_at')
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     return render(request,'Register.html',{
         'register':register,
         'alldepartments':alldepartments,
         'today':today,
-        'total_reg':total_reg
+        'total_reg':total_reg,
+        'reviews':reviews,
+        'avg_rating':round(avg_rating,1)
     })
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()
@@ -182,7 +187,13 @@ def process_qr(request):
 def MyRegistrations(request):
     alldepartments = DepartmentDb.objects.all()
     student = request.session.get('Logname')
-    registrations = RegistrationDb.objects.filter(Logname=student)
+    reg_filter_by_log = RegistrationDb.objects.filter(Logname=student)
+    eventArchived = EventDb.objects.filter(is_archived=True).values_list("title","euname")
+    registrations = []
+    for i in reg_filter_by_log:
+        is_archived = (i.event_name,i.dept_name) in eventArchived
+        if not is_archived or i.sattendance == "Present":
+            registrations.append(i)
     reg_present = RegistrationDb.objects.filter(Logname=student,sattendance="Present").count()
     reg_absent = RegistrationDb.objects.filter(Logname=student,sattendance="Absent").count()
     total_reg = RegistrationDb.objects.filter(Logname=student).count()
@@ -263,3 +274,12 @@ def signout(request):
     del request.session['Logname']
     messages.success(request,"Logged out Successfully")
     return redirect(Home)
+def submit_review(request,regId):
+    reg = RegistrationDb.objects.get(id=regId)
+    if request.method == "POST":
+        reg.rating = request.POST.get('rating')
+        reg.comment = request.POST.get('comment')
+        reg.commented_at = timezone.now()
+        reg.save()
+        messages.success(request,"Comment Added! Thank you for your Contribution")
+        return redirect(MyRegistrations)
