@@ -321,6 +321,7 @@ def process_qr(request):
             smob = s_mob,
             event_name = s_event
         ).update(sattendance="Present")
+        student = RegistrationDb.objects.get(sname=s_name)
 
         #certificate generation
         event = EventDb.objects.filter(title=s_event).first()
@@ -375,10 +376,18 @@ def process_qr(request):
 
         email = EmailMessage(
             subject=event.title,
-            body="Thank you for participating our program, your certificate is attached with this email.For any issues, contact to our website.",
+            body="",
             from_email="cirileb2003@gmail.com",
             to=[s_email]
         )
+        email.content_subtype = "html"
+        email.body = f"""
+                        <h4><strong>{student.event_name}</strong></h4>
+                        <p>This email is from ESEC event portal</p>
+
+                        <p><b>Message:<br>Your attendance for {student.event_name} marked successfully.Thank you for participating our event and we hereby attaching your participation certificate,you can verify your own certificates by scanning the qr at My Registrations section in our site.</b></p>
+                        <p style="color:red;">Note:If this email got deleted,you can still download your certificate from our site</p>
+                        """
         email.attach(
             filename,
             buffer.getvalue(),
@@ -445,10 +454,18 @@ def presentOffline(request,stud_id):
 
     email = EmailMessage(
         subject=event.title,
-        body="Thank you for participating our program, your certificate is attached with this email.For any issues, contact to our website.",
+        body="",
         from_email="cirileb2003@gmail.com",
         to=[s_email]
     )
+    email.content_subtype = "html"
+    email.body = f"""
+                <h4><strong>{student.event_name}</strong></h4>
+                <p>This email is from ESEC event portal</p>
+
+                <p><b>Message:<br>Your attendance for {student.event_name} marked successfully.Thank you for participating our event and we hereby attaching your participation certificate,you can verify your own certificates by scanning the qr at My Registrations section in our site.</b></p>
+                <p style="color:red;">Note:If this email got deleted,you can still download your certificate from our site</p>
+                """
     email.attach(
         filename,
         buffer.getvalue(),

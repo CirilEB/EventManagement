@@ -26,5 +26,6 @@ urlpatterns=[
     path('ForgotPassword/',views.ForgotPassword,name='ForgotPassword'),
     path('submit_forgot',views.submit_forgot,name='submit_forgot'),
     path('check_otp_pass',views.check_otp_pass,name='check_otp_pass'),
-    path('verify_otp_forgot/',views.verify_otp_forgot,name='verify_otp_forgot')
+    path('verify_otp_forgot/',views.verify_otp_forgot,name='verify_otp_forgot'),
+    path('Contact_Message',views.Contact_Message,name='Contact_Message')
 ]

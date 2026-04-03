@@ -68,23 +68,26 @@ def Register(request,event_id):
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()
     student = RegistrationDb.objects.get(id=stud_id)
+    test_key = settings.RAZORPAY_KEY_TEST
     pay = student.fee
     amount = int(pay*100)
     pay_str = str(amount)
     if request.method == "POST":
             order_currency = "INR"
-            client = razorpay.Client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
+            client = razorpay.Client(auth=(test_key,settings.RAZORPAY_KEY_SECRET))
             payment = client.order.create({'amount':amount,'currency':order_currency})
             student.razorpay_order_id = payment["id"]
             student.save()
             return render(request,'Payment_page.html',{
                 'alldepartments': alldepartments,
+                'test_key':test_key,
                 'pay_str':pay_str,
                 'payment':payment,
                 'student':student
             })
     return render(request, 'Payment_page.html', {
         'alldepartments': alldepartments,
+        'test_key':test_key,
         'pay_str': pay_str,
         'student': student
     })
@@ -94,7 +97,8 @@ def verify_payment(request):
         payment_id = request.POST.get("razorpay_payment_id")
         order_id = request.POST.get("razorpay_order_id")
         signature = request.POST.get("razorpay_signature")
-        client = razorpay.Client(auth=('rzp_test_SRUNBwpvVW3waU',settings.RAZORPAY_KEY_SECRET))
+        test_key = settings.RAZORPAY_KEY_TEST
+        client = razorpay.Client(auth=(test_key,settings.RAZORPAY_KEY_SECRET))
         params = {
             'razorpay_order_id': order_id,
             'razorpay_payment_id': payment_id,
@@ -103,22 +107,49 @@ def verify_payment(request):
         try:
             client.utility.verify_payment_signature(params)
             student = RegistrationDb.objects.get(razorpay_order_id=order_id)
+            event = EventDb.objects.get(title=student.event_name)
             student.pay_status = "Paid"
             student.save()
             # email notification
 
             email_message = EmailMessage(
                 subject=student.event_name,
-                body="Thank you for your registration.Use the QRcode below for Attendance and Certificate collection",
+                body="",
                 from_email=settings.EMAIL_HOST_USER,
                 to=[student.semail]
             )
+            email_message.content_subtype = "html"
+            email_message.body = f"""
+                                    <h4><strong>{student.event_name}</strong></h4>
+                                    <p>This email is from ESEC event portal</p>
+                                    
+                                    <p><strong>Student Details</strong></p>
+                                    <hr>
+                                    <p><b>Name:</b>{student.sname}</p>
+                                    <p><b>Amount:</b>{student.fee}</p>
+                                    <p><b>Order id:</b>{student.razorpay_order_id}</p>
+                                    
+                                    <p><strong>{event.title} - {event.type} Details</strong></p>
+                                    <hr>
+                                    <p><b>Starting :</b>{event.start}</p>
+                                    <p><b>Ending :</b>{event.end}</p>
+                                    <p><b>Event Mode:</b>{event.mode}</p>
+                                    <p><b>Venue:</b>{event.location}</p>
+                                    
+                                    <p><b>Message:<br>Your payment for {student.event_name} was successful.Thank you for registering and paying forward.Make use of below QR code to mark your attendance and to generate participation certificate</b></p>
+                                    <p style="color:red;">Note:If this email got deleted,you can still download your QR code from our site</p>
+                                    """
             email_message.attach_file(student.qr_image.path)
             email_message.send()
-            messages.success(request,"Payment was Successful")
-            return redirect(MyRegistrations)
+            return JsonResponse({
+                "status":"success",
+                "message":"Payment verified"
+            })
         except:
-            return HttpResponse(404)
+            return JsonResponse({
+                "status": "failed",
+                "message": "Payment not verified"
+            })
 
 def Save_registration(request):
     if request.method == "POST":
@@ -233,10 +264,18 @@ def save_signup(request):
         request.session['student_name'] = student_name
         email_message = EmailMessage(
             subject="OTP Verification",
-            body="Your OTP to register for Event Registraion Portal is " + str(otp),
+            body="",
             from_email="cirileb2003@gmail.com",
             to=[student_email]
         )
+        email_message.content_subtype = "html"
+        email_message.body = f"""
+                        <p><strong>Ready to Register?</strong></p>
+                        <p>This email is from ESEC event portal</p>
+
+                        <p><b>Message:<br>Your OTP to register for ESEC event portal {str(otp)}</b></p>
+                        <p style="color:red;">Note:This otp will be expired after five minutes</p>
+                        """
         email_message.send()
 
         return redirect(verify_otp)
@@ -303,10 +342,18 @@ def submit_forgot(request):
         request.session['student_pass'] = pswd
         email_message = EmailMessage(
             subject="OTP Verification",
-            body="Your OTP to change your old password " + str(otp),
+            body="",
             from_email="cirileb2003@gmail.com",
             to=[LogStudent.student_email]
         )
+        email_message.content_subtype = "html"
+        email_message.body = f"""
+                <p><strong>Forgot Your Password?</strong></p>
+                <p>This email is from ESEC event portal</p>
+
+                <p><b>Message:<br>Your OTP to change your old password {str(otp)}</b></p>
+                <p style="color:red;">Note:This otp will be expired after two minutes</p>
+                """
         email_message.send()
         return redirect(verify_otp_forgot)
 def check_otp_pass(request):
@@ -330,4 +377,30 @@ def check_otp_pass(request):
             messages.error(request,"Incorrect OTP !")
             student.delete()
             return redirect(ForgotPassword)
+
+
+def Contact_Message(request):
+    if request.method == "POST":
+        name = request.POST.get('contact_name')
+        email = request.POST.get('contact_email')
+        subject = request.POST.get('contact_subject')
+        message = request.POST.get('contact_message')
+        email_message = EmailMessage(
+            subject=subject,
+            body="",
+            from_email=email,
+            to=["cirileb2003@gmail.com"]
+        )
+        email_message.content_subtype = "html"
+        email_message.body = f"""
+        <p><strong>New Contact Message From Event Management</strong></p>
+        
+        <p><b>Name:</b>{name}</p>
+        <p><b>Email:</b>{email}</p>
+        
+        <p><b>Message:</b><br>{message}</p>
+        """
+        email_message.send()
+        messages.success(request,"Message Send Successfully!")
+        return redirect(Home)
 

@@ -210,13 +210,30 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         var options = {
-            "key" : "rzp_test_SRUNBwpvVW3waU",
+            "key" : "{{ test_key }}",
             "amount" : "{{ pay_str }}",
             "currency" : "INR",
             "order_id" : "{{ payment.id }}",
             "name" : "{{ student.event_name }}",
             "description" : "QR will be sent to your email after payment",
-            "callback_url" : "{% url 'verify_payment' %}"
+            "handler": function(response){
+                fetch("/EventRegister/verify_payment/",{
+                    method: "POST",
+                    headers:{
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify(response)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success"){
+                        window.location.href = "/EventRegister/MyRegistrations/?status=success";
+                    }else{
+                        window.location.href = "/EventRegister/MyRegistrations/?status=failed";
+                    }
+                });
+            }
         };
         var rzp = new Razorpay(options);
         rzp.open();
