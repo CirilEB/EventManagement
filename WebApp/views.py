@@ -83,13 +83,15 @@ def Payment(request,stud_id):
                 'test_key':test_key,
                 'pay_str':pay_str,
                 'payment':payment,
-                'student':student
+                'student':student,
+                'stud_id':stud_id
             })
     return render(request, 'Payment_page.html', {
         'alldepartments': alldepartments,
         'test_key':test_key,
         'pay_str': pay_str,
-        'student': student
+        'student': student,
+        'stud_id':stud_id
     })
 @csrf_exempt
 def verify_payment(request):
@@ -403,4 +405,51 @@ def Contact_Message(request):
         email_message.send()
         messages.success(request,"Message Send Successfully!")
         return redirect(Home)
+
+
+def mock_success(request,reg_id):
+    student = RegistrationDb.objects.get(id=reg_id)
+    event = EventDb.objects.get(title=student.event_name)
+    student.razorpay_order_id = "mock success"
+    student.pay_status = "Paid"
+    student.save()
+    # email notification
+
+    email_message = EmailMessage(
+        subject=student.event_name,
+        body="",
+        from_email=settings.EMAIL_HOST_USER,
+        to=[student.semail]
+    )
+    email_message.content_subtype = "html"
+    email_message.body = f"""
+                                        <h4><strong>{student.event_name}</strong></h4>
+                                        <p>This email is from ESEC event portal</p>
+
+                                        <p><strong>Student Details</strong></p>
+                                        <hr>
+                                        <p><b>Name:</b>{student.sname}</p>
+                                        <p><b>Amount:</b>{student.fee}</p>
+                                        <p><b>Order id:</b>{student.razorpay_order_id}</p>
+
+                                        <p><strong>{event.title} - {event.type} Details</strong></p>
+                                        <hr>
+                                        <p><b>Starting :</b>{event.start}</p>
+                                        <p><b>Ending :</b>{event.end}</p>
+                                        <p><b>Event Mode:</b>{event.mode}</p>
+                                        <p><b>Venue:</b>{event.location}</p>
+
+                                        <p><b>Message:<br>Your payment for {student.event_name} was successful.Thank you for registering and paying forward.Make use of below QR code to mark your attendance and to generate participation certificate</b></p>
+                                        <p style="color:red;">Note:If this email got deleted,you can still download your QR code from our site</p>
+                                        """
+    email_message.attach_file(student.qr_image.path)
+    email_message.send()
+    messages.success(request,"Payment Successful!")
+    return redirect(MyRegistrations)
+def mock_failed(request,reg_id):
+    student = RegistrationDb.objects.get(id=reg_id)
+    student.razorpay_order_id = "mock failed"
+    student.save()
+    messages.error(request,"Payment Failed!")
+    return redirect(MyRegistrations)
 

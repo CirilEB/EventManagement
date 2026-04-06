@@ -27,5 +27,7 @@ urlpatterns=[
     path('submit_forgot',views.submit_forgot,name='submit_forgot'),
     path('check_otp_pass',views.check_otp_pass,name='check_otp_pass'),
     path('verify_otp_forgot/',views.verify_otp_forgot,name='verify_otp_forgot'),
-    path('Contact_Message',views.Contact_Message,name='Contact_Message')
+    path('Contact_Message',views.Contact_Message,name='Contact_Message'),
+    path('mock_success/<int:reg_id>',views.mock_success,name='mock_success'),
+path('mock_failed/<int:reg_id>',views.mock_failed,name='mock_failed')
 ]
