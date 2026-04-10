@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9ymjd_-pa@tv0uc+p$hs!ja6hoxs!$98lm@b0wnumqk$^5mco4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = ['cirileb.pythonanywhere.com']
 CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com']
