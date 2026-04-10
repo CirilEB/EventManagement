@@ -30,8 +30,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = []
-CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com']
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com']
+    CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com']
 
 
 # Application definition
