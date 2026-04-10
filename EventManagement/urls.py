@@ -18,13 +18,15 @@ from django.contrib import admin
 from django.urls import path,include
 import SuperAdmin.urls
 import WebApp.urls
+from WebApp import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns,static
 from EventManagement import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('AdminPanel/',include(SuperAdmin.urls)),
-    path('EventRegister/',include(WebApp.urls))
+    path('EventRegister/',include(WebApp.urls)),
+    path('',views.Home,name='Home')
 ]
 
 urlpatterns += staticfiles_urlpatterns()
