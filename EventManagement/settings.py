@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
 if DEBUG:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com','127.0.0.1']
 else:
     ALLOWED_HOSTS = ['cirileb.pythonanywhere.com']
     CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com']
