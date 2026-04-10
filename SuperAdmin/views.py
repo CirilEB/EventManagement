@@ -18,6 +18,8 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.files.storage import FileSystemStorage
+
+from EventManagement.settings import BASE_DIR
 from SuperAdmin.models import DepartmentDb, EventDb
 from django.contrib.auth.models import User
 from django.contrib.auth import  authenticate,login
@@ -25,6 +27,7 @@ from django.views.decorators.csrf import csrf_exempt
 from WebApp.models import RegistrationDb
 from django.contrib.auth.hashers import make_password,check_password
 
+font_path = os.path.join(BASE_DIR,'fonts','arialceb.ttf')
 
 # Create your views here.
 def SuperAdminPanel(request):
@@ -342,7 +345,7 @@ def process_qr(request):
 
         base_font_size = 20
         font_size = int(base_font_size * scale)
-        font = ImageFont.truetype("arial.ttf", font_size)
+        font = ImageFont.truetype(font_path, font_size)
 
         reg = RegistrationDb.objects.get(sname = s_name,event_name = s_event)
         qr_img = Image.open(reg.qr_image.path).convert("RGB")
@@ -424,7 +427,7 @@ def presentOffline(request,stud_id):
 
     base_font_size = 20
     font_size = int(base_font_size * scale)
-    font = ImageFont.truetype("arial.ttf", font_size)
+    font = ImageFont.truetype(font_path, font_size)
 
     reg = RegistrationDb.objects.get(sname=s_name, event_name=s_event)
     qr_img = Image.open(reg.qr_image.path).convert("RGB")
