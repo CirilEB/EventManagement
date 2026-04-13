@@ -17,19 +17,9 @@
                                         <thead class="bg-info text-white">
                                             <tr>
                                                 <th>Title</th>
-                                                <th>Description</th>
-                                                <th>Event Type</th>
+                                                <th>View Event<th>
                                                 <th>Department</th>
-                                                <th>Starting</th>
-                                                <th>Ending</th>
-                                                <th>Regestration Deadline</th>
-                                                <th>Mode</th>
-                                                <th>Location</th>
-                                                <th>Max Participants</th>
-                                                <th>Registration Fees</th>
-                                                <th>Certificate Template</th>
-                                                <th>Poster</th>
-                                                <th>Status</th>
+                                                <th>Approval Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -37,29 +27,23 @@
                                         {% if i.is_archived == False %}
                                             <tr>
                                                 <td>{{ i.title }}</td>
-                                                <td>{{ i.description }}</td>
-                                                <td>{{ i.type }}</td>
-                                                <td>{{ i.dept }}</td>
-                                                <td>{{ i.start }}</td>
-                                                <td>{{ i.end }}</td>
-                                                <td>{{ i.dead }}</td>
-                                                <td>{{ i.mode }}</td>
-                                                <td>{{ i.location }}</td>
-                                                <td>{{ i.maxS }}</td>
-                                                <td>{{ i.fee }}</td>
                                                 <td>
-                                                    <img src="{{ i.certificate.url }}" alt="" height="50px">
+                                                    <a class="btn btn-warning btn-rounded" href="{% url 'view_individual_event' event_id=i.id %}"><i class="fa fa-eye"></i></a>
                                                 </td>
-                                                <td>
-                                                    <img src="{{ i.poster.url }}" alt="" height="50px">
-                                                </td>
+                                                <td></td>
+                                                <td>{{ i.euname }}</td>
                                                 <td>
                                                     <div style="display:flex;gap:10px;">
                                                     <a class="btn btn-rounded">{{ i.status }}</a>
-                                                        {% if i.status == "Pending" %}
+                                                        {% if i.status == "Pending" or i.status == "Disapproved" %}
                                                         <form action="{% url 'event_approval' approval_id=i.id %}" method="post">
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-success btn-rounded" style="color:white;">Approve</button>
+                                                        </form>
+                                                        {% else %}
+                                                        <form action="{% url 'event_disapproval' disapproval_id=i.id %}" method="post">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger btn-rounded" style="color:white;">Disapprove</button>
                                                         </form>
                                                         {% endif %}
                                                     </div>

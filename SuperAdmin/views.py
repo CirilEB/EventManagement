@@ -254,6 +254,13 @@ def event_approval(request,approval_id):
         event.save()
         messages.success(request,"Event Approved Successfully")
         return redirect(all_event)
+def event_disapproval(request,disapproval_id):
+    if request.method == "POST":
+        event = EventDb.objects.get(id=disapproval_id)
+        event.status = "Disapproved"
+        event.save()
+        messages.success(request,"Event Disapproved Successfully")
+        return redirect(all_event)
 def delete_event(request,delete_id):
     event = EventDb.objects.get(id=delete_id)
     registrations = RegistrationDb.objects.filter(event_name=event.title)
@@ -631,6 +638,10 @@ def Save_conclude(request,event_id):
         EventDb.objects.filter(id=event_id,euname=uname).update(conclude=conclude)
         messages.success(request,"Conclusion Added to Report")
         return redirect(archived_events)
+
+def view_individual_event(request,event_id):
+    event = EventDb.objects.get(id=event_id)
+    return render(request,'view_individual_event.html',{'event':event})
 
 
 

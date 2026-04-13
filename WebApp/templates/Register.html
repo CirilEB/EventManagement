@@ -272,6 +272,9 @@
 <!--                    </div>-->
                </div>
 
+                {% if request.session.Logname %}
+                {% if register.dead > today %}
+                {% if register.is_archived == False %}
                 <div class="col-lg-4 mt-5 mt-lg-0">
                     <div class="bg-primary mb-5 py-3">
                         <h3 class="text-white py-3 px-4 m-0">Event Details</h3>
@@ -310,6 +313,9 @@
                         </div>
                     </div>
                     </form>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
 
                     <div class="mb-5">
                         <h2 class="mb-3">Categories</h2>

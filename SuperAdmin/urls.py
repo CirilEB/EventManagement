@@ -19,6 +19,7 @@ urlpatterns=[
     path('ViewEvent/',views.view_event,name='view_event'),
     path('all_event/',views.all_event,name='all_event'),
     path('event_approval/<int:approval_id>',views.event_approval,name='event_approval'),
+    path('event_disapproval/<int:disapproval_id>', views.event_disapproval, name='event_disapproval'),
     path('delete_event/<int:delete_id>', views.delete_event, name='delete_event'),
     path('Registrations/',views.college_registered_events,name='registrations'),
     path('student_registrations/<int:viewreg_id>/',views.student_registrations,name='student_registrations'),
@@ -34,5 +35,6 @@ urlpatterns=[
     path('Unarchive/<int:archive_id>/',views.Unarchive,name='Unarchive'),
     path('zipDownload/<int:download_id>/',views.zipDownload,name='zipDownload'),
     path('AddConclusion/<int:event_id>/',views.AddConclusion,name='AddConclusion'),
-    path('Save_conclude/<int:event_id>/',views.Save_conclude,name='Save_conclude')
+    path('Save_conclude/<int:event_id>/',views.Save_conclude,name='Save_conclude'),
+    path('view_individual_event/<int:event_id>/',views.view_individual_event,name='view_individual_event')
 ]

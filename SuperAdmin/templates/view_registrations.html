@@ -26,9 +26,16 @@
                                         <tr>
                                             <td>{{ i.title }}</td>
                                             <td>
+                                                {% if i.status == "Approved" %}
                                                 <a href="{% url 'student_registrations' viewreg_id=i.id %}" class="btn btn-primary">View Registrations</a>&nbsp;&nbsp;&nbsp;
                                                 <a href="{% url 'certificate_editor' e_certi=i.id %}" class="btn btn-warning">Certificate Editor</a>&nbsp;&nbsp;&nbsp;
                                                 <a onclick="confirmDelete('{% url 'archiveSuccess' archive_id=i.id %}')" href="#" class="btn btn-success">Add to archive</a>
+                                                {% else %}
+                                                <div class="d-flex" style="gap:20px;">
+                                                <a href="{% url 'certificate_editor' e_certi=i.id %}" class="btn btn-warning">Certificate Editor</a>
+                                                <p class="text-danger">Registrations shown only after approval</p>
+                                                </div>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endif %}

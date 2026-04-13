@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% extends 'super_admin.html' %}
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h3>{{ event.title }}</h3>
+    <p>{{ event.description }}</p>
+    <h4>Department : {{ event.euname }} &nbsp;|&nbsp; Type : {{ event.type }} &nbsp;|&nbsp; Mode : {{ event.mode }}<h4><br>
+        <h5>Registration Deadline : {{ event.dead }}</h5>
+        <h5>Start Date : {{ event.start }}</h5>
+        <h5>End Date : {{ event.end }}</h5>
+        <h5>Venue : {{ event.location }}</h5>
+        <h5>Maximum Students Allowed : {{ event.maxS }}</h5>
+        <h5>Event Fee : Rs. {{ event.fee }}</h5><br><br>
+        <div class="row">
+            <div class="col-md-6">
+                <img width="450" src="{{ event.certificate.url }}" alt="">
+            </div>
+            <div class="col-md-6">
+                <img width="450" src="{{ event.poster.url }}" alt="">
+            </div>
+        </div>
+<!--<td>-->
+<!--    <img src="{{ i.certificate.url }}" alt="" height="50px">-->
+<!--</td>-->
+<!--<td>-->
+<!--    <img src="{{ i.poster.url }}" alt="" height="50px">-->
+<!--</td>-->
+</body>
+</html>
+{% endblock %}
