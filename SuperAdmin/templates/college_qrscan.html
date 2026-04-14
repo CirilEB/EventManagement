@@ -11,14 +11,26 @@
 <p id="result"></p>
 <div id="reader" style="width:350px;"></div>
 <style>
-    #reader video{
+    #reader video.mirror{
         transform:scaleX(-1);
     }
 </style>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     let scanner;
     let isProcessing = false;
+    function applyMirror(){
+        const video = document.querySelector("#reader video");
+        if (video){
+            if (!isMobile) {
+                video.classList.add("mirror");
+            }else{
+                video.classList.remove("mirror");
+            }
+        }
+        requestAnimationFrame(applyMirror);
+    }
 
     async function onScanSuccess(decodedText){
         if (isProcessing) return;
@@ -57,9 +69,17 @@
         }
     }scanner = new Html5QrcodeScanner(
         "reader",
-        { fps: 10, qrbox: 200 }
+        {
+         fps: 10,
+         qrbox: 200,
+         videoConstraints: {
+            facingMode: isMobile ? "environment" : "user"
+         }
+        },
+        false
     );
     scanner.render(onScanSuccess);
+    applyMirror();
 </script>
 </body>
 </html>

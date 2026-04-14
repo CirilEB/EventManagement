@@ -213,12 +213,25 @@
     <!-- Template Javascript -->
     <script src="{% static 'Web/js/main.js' %}"></script>
     <style>
-    #reader video{
+    #reader video.mirror{
         transform:scaleX(-1);
     }
 </style>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    function applyMirror(){
+        const video = document.querySelector("#reader video");
+        if (video){
+            if (!isMobile) {
+                video.classList.add("mirror");
+            }else{
+                video.classList.remove("mirror");
+            }
+        }
+        requestAnimationFrame(applyMirror);
+    }
+
     function onScanSuccess(decodedText){
         document.getElementById("result1").innerText = "";
         try{
@@ -249,9 +262,17 @@
         }
     }let scanner = new Html5QrcodeScanner(
         "reader",
-        { fps: 10, qrbox: 200 }
+        {
+         fps: 10,
+         qrbox: 200,
+         videoConstraints: {
+            facingMode: isMobile ? "environment" : "user"
+         }
+        },
+        false
     );
     scanner.render(onScanSuccess);
+    applyMirror();
 </script>
 </body>
 

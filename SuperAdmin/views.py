@@ -37,7 +37,8 @@ def SuperAdminPanel(request):
     approve_event = EventDb.objects.filter(status="Approved").count()
     pending_event = EventDb.objects.filter(status="Pending").count()
     paid_revenue = RegistrationDb.objects.filter(pay_status="Paid").aggregate(total=Sum('fee'))['total'] or 0
-    unpaid_revenue = RegistrationDb.objects.filter(pay_status="Unpaid").aggregate(total=Sum('fee'))['total'] or 0
+    unarchived_events = EventDb.objects.filter(is_archived=False).values_list('title',flat=True)
+    unpaid_revenue = RegistrationDb.objects.filter(pay_status="Unpaid",event_name__in=unarchived_events).aggregate(total=Sum('fee'))['total'] or 0
     attended = RegistrationDb.objects.filter(sattendance="Present").count()
     percent = round((attended / total_reg * 100), 2) if total_reg else 0
 
@@ -161,7 +162,8 @@ def CollegeAdminPanel(request):
     total_reg = RegistrationDb.objects.filter(dept_name=dept.code).count()
     paid_data = RegistrationDb.objects.filter(dept_name=dept.code,pay_status='Paid').aggregate(total=Sum('fee'))
     revenue = paid_data['total'] or 0
-    pending_data = RegistrationDb.objects.filter(dept_name=dept.code,pay_status='Unpaid').aggregate(total=Sum('fee'))
+    unarchived_events = EventDb.objects.filter(is_archived=False).values_list('title', flat=True)
+    pending_data = RegistrationDb.objects.filter(dept_name=dept.code,pay_status='Unpaid',event_name__in=unarchived_events).aggregate(total=Sum('fee'))
     unpaid_revenue = pending_data['total'] or 0
     total_events = EventDb.objects.filter(euname=dept.code).count()
     approve_event = EventDb.objects.filter(euname=dept.code,status='Approved').count()
