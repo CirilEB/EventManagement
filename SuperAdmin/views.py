@@ -376,8 +376,9 @@ def process_qr(request):
 
 
         buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        filename = f"{s_name}_{s_event}.png"
+        img = img.convert("RGB")
+        img.save(buffer, format="JPEG")
+        filename = f"{s_name}_{s_event}.jpg"
         reg.certificate_image.save(
             filename,
             ContentFile(buffer.getvalue()),
@@ -403,7 +404,7 @@ def process_qr(request):
         email.attach(
             filename,
             buffer.getvalue(),
-            "image/png"
+            "image/jpg"
         )
         email.send()
 
@@ -456,8 +457,9 @@ def presentOffline(request,stud_id):
     draw.text((date_x, date_y), str(event.start), fill="black", font=font)
 
     buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    filename = f"{s_name}_{s_event}.png"
+    img = img.convert("RGB")
+    img.save(buffer, format="JPEG")
+    filename = f"{s_name}_{s_event}.jpg"
     reg.certificate_image.save(
         filename,
         ContentFile(buffer.getvalue()),
@@ -481,7 +483,7 @@ def presentOffline(request,stud_id):
     email.attach(
         filename,
         buffer.getvalue(),
-        "image/png"
+        "image/jpg"
     )
     email.send()
     messages.success(request,"Attendance Marked Successfully")
