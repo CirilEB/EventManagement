@@ -333,11 +333,16 @@ def process_qr(request):
             smob = s_mob,
             event_name = s_event
         ).update(sattendance="Present")
-        student = RegistrationDb.objects.get(sname=s_name)
+        student = RegistrationDb.objects.filter(sname=s_name,event_name=s_event).first()
 
         #certificate generation
+        Max_Dimension = 2500
         event = EventDb.objects.filter(title=s_event).first()
         img = Image.open(event.certificate.path)
+        if max(img.size) > Max_Dimension:
+            ratio = Max_Dimension / max(img.size)
+            new_size = (int(img.width * ratio), int(img.height * ratio))
+            img = img.resize(new_size, Image.LANCZOS)
         img_width, img_height = img.size
         dispaly_width = 500
         scale = img_width / dispaly_width
@@ -356,7 +361,7 @@ def process_qr(request):
         font_size = int(base_font_size * scale)
         font = ImageFont.truetype(font_path, font_size)
 
-        reg = RegistrationDb.objects.get(sname = s_name,event_name = s_event)
+        reg = RegistrationDb.objects.filter(sname = s_name,event_name = s_event).first()
         qr_img = Image.open(reg.qr_image.path).convert("RGB")
         base_qr_size = 80
         qr_size = int(base_qr_size * scale)
@@ -377,7 +382,7 @@ def process_qr(request):
 
         buffer = BytesIO()
         img = img.convert("RGB")
-        img.save(buffer, format="JPEG")
+        img.save(buffer, format="JPEG", quality=85, optimize=True)
         filename = f"{s_name}_{s_event}.jpg"
         reg.certificate_image.save(
             filename,
@@ -420,8 +425,13 @@ def presentOffline(request,stud_id):
     s_email = student.semail
 
     # certificate generation
+    Max_Dimension = 2500
     event = EventDb.objects.filter(title=s_event).first()
     img = Image.open(event.certificate.path)
+    if max(img.size) > Max_Dimension:
+        ratio = Max_Dimension / max(img.size)
+        new_size = (int(img.width * ratio), int(img.height * ratio))
+        img = img.resize(new_size, Image.LANCZOS)
     img_width, img_height = img.size
     dispaly_width = 500
     scale = img_width / dispaly_width
@@ -439,7 +449,7 @@ def presentOffline(request,stud_id):
     font_size = int(base_font_size * scale)
     font = ImageFont.truetype(font_path, font_size)
 
-    reg = RegistrationDb.objects.get(sname=s_name, event_name=s_event)
+    reg = RegistrationDb.objects.filter(sname=s_name, event_name=s_event).first()
     qr_img = Image.open(reg.qr_image.path).convert("RGB")
     base_qr_size = 80
     qr_size = int(base_qr_size * scale)
@@ -458,7 +468,7 @@ def presentOffline(request,stud_id):
 
     buffer = BytesIO()
     img = img.convert("RGB")
-    img.save(buffer, format="JPEG")
+    img.save(buffer, format="JPEG", quality=85, optimize=True)
     filename = f"{s_name}_{s_event}.jpg"
     reg.certificate_image.save(
         filename,
