@@ -8,6 +8,7 @@ from django.db.models import Avg
 import json
 import qrcode
 import random
+import requests
 import razorpay
 from io import BytesIO
 from django.core.files.base import ContentFile
@@ -141,7 +142,13 @@ def verify_payment(request):
                                     <p><b>Message:<br>Your payment for {student.event_name} was successful.Thank you for registering and paying forward.Make use of below QR code to mark your attendance and to generate participation certificate</b></p>
                                     <p style="color:red;">Note:If this email got deleted,you can still download your QR code from our site</p>
                                     """
-            email_message.attach_file(student.qr_image.path)
+            file_url = student.qr_image.url
+            response = requests.get(file_url)
+            email_message.attach(
+                student.qr_image.name.split('/')[-1],
+                response.content,
+                'image/png'
+            )
             email_message.send()
             return JsonResponse({
                 "status":"success",
@@ -204,7 +211,6 @@ def process_qr(request):
         s_email = data.get("email")
         s_mob = data.get("mobile")
         s_event = data.get("event")
-        print(s_name,s_email,s_mob,s_event)
         reg = RegistrationDb.objects.filter(
             sname = s_name,
             event_name = s_event,
@@ -231,6 +237,7 @@ def MyRegistrations(request):
     reg_present = RegistrationDb.objects.filter(Logname=student,sattendance="Present").count()
     reg_absent = RegistrationDb.objects.filter(Logname=student,sattendance="Absent").count()
     total_reg = RegistrationDb.objects.filter(Logname=student).count()
+    obj = RegistrationDb.objects.last()
     return render(request,'MyRegistrations.html',{
         'student':student,
         'registrations':registrations,
@@ -442,7 +449,13 @@ def mock_success(request,reg_id):
                                         <p><b>Message:<br>Your payment for {student.event_name} was successful.Thank you for registering and paying forward.Make use of below QR code to mark your attendance and to generate participation certificate</b></p>
                                         <p style="color:red;">Note:If this email got deleted,you can still download your QR code from our site</p>
                                         """
-    email_message.attach_file(student.qr_image.path)
+    file_url = student.qr_image.url
+    response = requests.get(file_url)
+    email_message.attach(
+        student.qr_image.name.split('/')[-1],
+        response.content,
+        'image/png'
+    )
     email_message.send()
     messages.success(request,"Payment Successful!")
     return redirect(MyRegistrations)

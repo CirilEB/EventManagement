@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 import zipfile
 from openpyxl import Workbook
 from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Image as reportImg,Table,TableStyle
@@ -145,7 +146,6 @@ def admin_login(request):
         messages.success(request, "Logged in Successfully")
         return redirect(CollegeAdminPanel)
     else:
-        print("User not found..!")
         messages.error(request, "Unknown Credentials !")
         return redirect(login_page)
 
@@ -326,7 +326,6 @@ def process_qr(request):
         s_email = data.get("email")
         s_mob = data.get("mobile")
         s_event = data.get("event")
-        print(s_name,s_email,s_mob,s_event)
         RegistrationDb.objects.filter(
             sname = s_name,
             semail = s_email,
@@ -338,7 +337,8 @@ def process_qr(request):
         #certificate generation
         Max_Dimension = 2500
         event = EventDb.objects.filter(title=s_event).first()
-        img = Image.open(event.certificate.path)
+        response = requests.get(event.certificate.url)
+        img = Image.open(BytesIO(response.content))
         if max(img.size) > Max_Dimension:
             ratio = Max_Dimension / max(img.size)
             new_size = (int(img.width * ratio), int(img.height * ratio))
@@ -362,7 +362,8 @@ def process_qr(request):
         font = ImageFont.truetype(font_path, font_size)
 
         reg = RegistrationDb.objects.filter(sname = s_name,event_name = s_event).first()
-        qr_img = Image.open(reg.qr_image.path).convert("RGB")
+        response = requests.get(reg.qr_image.url)
+        qr_img = Image.open(BytesIO(response.content)).convert("RGB")
         base_qr_size = 80
         qr_size = int(base_qr_size * scale)
         qr_img = qr_img.resize((qr_size,qr_size), Image.NEAREST)
@@ -427,7 +428,8 @@ def presentOffline(request,stud_id):
     # certificate generation
     Max_Dimension = 2500
     event = EventDb.objects.filter(title=s_event).first()
-    img = Image.open(event.certificate.path)
+    response = requests.get(event.certificate.url)
+    img = Image.open(BytesIO(response.content))
     if max(img.size) > Max_Dimension:
         ratio = Max_Dimension / max(img.size)
         new_size = (int(img.width * ratio), int(img.height * ratio))
@@ -450,7 +452,8 @@ def presentOffline(request,stud_id):
     font = ImageFont.truetype(font_path, font_size)
 
     reg = RegistrationDb.objects.filter(sname=s_name, event_name=s_event).first()
-    qr_img = Image.open(reg.qr_image.path).convert("RGB")
+    response = requests.get(reg.qr_image.url)
+    qr_img = Image.open(BytesIO(response.content)).convert("RGB")
     base_qr_size = 80
     qr_size = int(base_qr_size * scale)
     qr_img = qr_img.resize((qr_size, qr_size), Image.NEAREST)
@@ -549,14 +552,16 @@ def zipDownload(request,download_id):
 
         #Student Certififcates
         for i in registrations:
-            if i.certificate_image and os.path.exists(i.certificate_image.path):
-                file_path = i.certificate_image.path
-                file_name = os.path.basename(file_path)
+            if i.certificate_image:
+                file_url = i.certificate_image.url
+                file_name = i.certificate_image.name.split('/')[-1]
+                response = requests.get(file_url)
 
-                zip_file.write(
-                    file_path,
-                    arcname=f"{event.title}_{event.euname}/certificates/{file_name}"
-                )
+                if response.status_code == 200:
+                    zip_file.writestr(
+                        f'{event.title}_{event.euname}/certificates/{file_name}.jpg',
+                        response.content
+                    )
 
         #Event Report PDF
         report_buffer = BytesIO()

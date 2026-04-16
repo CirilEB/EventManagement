@@ -19,8 +19,7 @@ from django.urls import path,include
 import SuperAdmin.urls
 import WebApp.urls
 from WebApp import views
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns,static
-from EventManagement import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +29,3 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
-urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
