@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
-from django.core.files.storage import default_storage
+import dj_database_url
 from dotenv import load_dotenv
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR,'.env'))
@@ -38,10 +37,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
 if DEBUG:
-    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com','127.0.0.1']
+    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com','.onrender.com','127.0.0.1']
 else:
-    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com']
-    CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com']
+    ALLOWED_HOSTS = ['cirileb.pythonanywhere.com','.onrender.com']
+    CSRF_TRUSTED_ORIGINS = ['https://cirileb.pythonanywhere.com','https://*.onrender.com']
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO','https')
 
 
 # Application definition
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -93,10 +94,9 @@ WSGI_APPLICATION = 'EventManagement.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL')
+    )
 }
 
 

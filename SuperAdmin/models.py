@@ -5,10 +5,10 @@ class DepartmentDb(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20)
     email = models.CharField(max_length=50)
-    mob = models.IntegerField()
+    mob = models.BigIntegerField()
     hod = models.CharField(max_length=50)
     cuname = models.CharField(max_length=50,default="")
-    cpswd = models.CharField(max_length=20,default="")
+    cpswd = models.CharField(max_length=128,default="")
     def __str__(self):
         return self.name
 
@@ -24,20 +24,20 @@ class EventDb(models.Model):
     dead = models.DateField()
     mode = models.CharField(max_length=10)
     location = models.CharField(max_length=100)
-    maxS = models.IntegerField()
-    fee = models.IntegerField()
+    maxS = models.BigIntegerField()
+    fee = models.BigIntegerField()
     certificate = models.ImageField(upload_to='certificate_templates')
     poster = models.ImageField(upload_to='posters')
     status = models.CharField(max_length=20,default="Pending")
 
-    name_x = models.IntegerField(null=True, blank=True)
-    name_y = models.IntegerField(null=True, blank=True)
-    event_x = models.IntegerField(null=True, blank=True)
-    event_y = models.IntegerField(null=True, blank=True)
-    date_x = models.IntegerField(null=True, blank=True)
-    date_y = models.IntegerField(null=True, blank=True)
-    qr_x = models.IntegerField(null=True, blank=True)
-    qr_y = models.IntegerField(null=True, blank=True)
+    name_x = models.BigIntegerField(null=True, blank=True)
+    name_y = models.BigIntegerField(null=True, blank=True)
+    event_x = models.BigIntegerField(null=True, blank=True)
+    event_y = models.BigIntegerField(null=True, blank=True)
+    date_x = models.BigIntegerField(null=True, blank=True)
+    date_y = models.BigIntegerField(null=True, blank=True)
+    qr_x = models.BigIntegerField(null=True, blank=True)
+    qr_y = models.BigIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.title
