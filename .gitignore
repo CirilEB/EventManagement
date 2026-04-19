@@ -12,6 +12,7 @@ env/
 *.log
 db.sqlite3
 media/
+create_superuser.py
 
 staticfiles/
 # Environment variables
