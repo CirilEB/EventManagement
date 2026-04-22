@@ -250,11 +250,10 @@ def student_loginPage(request):
     student = request.session.get('student_name')
     if student:
         student_data = StudentDb.objects.get(student_name=student)
-        student_data.delete()
+        if student_data.is_verified == False:
+            student_data.delete()
         del request.session['student_name']
-        return render(request,'student_login.html')
-    else:
-        return render(request,'student_login.html')
+    return render(request,'student_login.html')
 def student_signup(request):
     return render(request,'student_signup.html')
 def check_username(request):
@@ -297,20 +296,20 @@ def check_otp(request):
         entered_otp = request.POST.get('enterotp')
         student_name = request.session.get('student_name')
         student = StudentDb.objects.get(student_name=student_name)
-        del request.session['student_name']
         if timezone.now() > student.created_at + timedelta(minutes=5):
             student.delete()
+            del request.session['student_name']
             messages.error(request, "OTP Expired !")
             return redirect(student_signup)
         if student.student_otp == entered_otp:
             student.is_verified = True
             student.save()
+            del request.session['student_name']
             messages.success(request,"OTP Verified and Registered Successfully")
             return redirect(student_loginPage)
         else:
             messages.error(request,"Incorrect OTP !")
-            student.delete()
-            return redirect(student_signup)
+            return redirect(verify_otp)
 def login_check(request):
     if request.method == "POST":
         Lname = request.POST.get('name')
@@ -345,47 +344,51 @@ def submit_forgot(request):
         pass_original = request.POST.get('pass')
         pswd = make_password(pass_original)
         otp = random.randint(100000, 999999)
-        LogStudent = StudentDb.objects.filter(student_name=uname).first()
-        StudentDb.objects.filter(student_name=uname).update(student_otp=otp,created_at=timezone.now())
-        request.session['student_name'] = uname
-        request.session['student_pass'] = pswd
-        email_message = EmailMessage(
-            subject="OTP Verification",
-            body="",
-            from_email="cirileb2003@gmail.com",
-            to=[LogStudent.student_email]
-        )
-        email_message.content_subtype = "html"
-        email_message.body = f"""
-                <p><strong>Forgot Your Password?</strong></p>
-                <p>This email is from ESEC event portal</p>
-
-                <p><b>Message:<br>Your OTP to change your old password {str(otp)}</b></p>
-                <p style="color:red;">Note:This otp will be expired after two minutes</p>
-                """
-        email_message.send()
-        return redirect(verify_otp_forgot)
+        if not StudentDb.objects.filter(student_name=uname).exists():
+            messages.error(request,"Username does not exists !")
+            return redirect(ForgotPassword)
+        else:
+            LogStudent = StudentDb.objects.filter(student_name=uname).first()
+            StudentDb.objects.filter(student_name=uname).update(student_otp=otp,created_at=timezone.now())
+            request.session['student_name'] = uname
+            request.session['student_pass'] = pswd
+            email_message = EmailMessage(
+                subject="OTP Verification",
+                body="",
+                from_email="cirileb2003@gmail.com",
+                to=[LogStudent.student_email]
+            )
+            email_message.content_subtype = "html"
+            email_message.body = f"""
+                    <p><strong>Forgot Your Password?</strong></p>
+                    <p>This email is from ESEC event portal</p>
+    
+                    <p><b>Message:<br>Your OTP to change your old password {str(otp)}</b></p>
+                    <p style="color:red;">Note:This otp will be expired after two minutes</p>
+                    """
+            email_message.send()
+            return redirect(verify_otp_forgot)
 def check_otp_pass(request):
     if request.method == "POST":
         entered_otp = request.POST.get('enterotp')
         student_name = request.session.get('student_name')
         student_pass = request.session.get('student_pass')
         student = StudentDb.objects.get(student_name=student_name)
-        del request.session['student_name']
-        del request.session['student_pass']
         if timezone.now() > student.created_at + timedelta(minutes=2):
-            student.delete()
+            del request.session['student_name']
+            del request.session['student_pass']
             messages.error(request, "OTP Expired !")
             return redirect(ForgotPassword)
         if student.student_otp == entered_otp:
             student.student_pass = student_pass
             student.save()
+            del request.session['student_name']
+            del request.session['student_pass']
             messages.success(request,"OTP Verified and Password Changed!")
             return redirect(student_loginPage)
         else:
             messages.error(request,"Incorrect OTP !")
-            student.delete()
-            return redirect(ForgotPassword)
+            return redirect(verify_otp_forgot)
 
 
 def Contact_Message(request):
