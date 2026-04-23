@@ -54,6 +54,7 @@ def Register(request,event_id):
     total_reg = RegistrationDb.objects.filter(event_name=register.title).count()
     reviews = RegistrationDb.objects.filter(event_name=register.title,rating__isnull=False).order_by('-commented_at')
     avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    remaining = register.maxS - total_reg
     return render(request,'Register.html',{
         'register':register,
         'alldepartments':alldepartments,
@@ -61,7 +62,8 @@ def Register(request,event_id):
         'total_reg':total_reg,
         'reviews':reviews,
         'avg_rating':round(avg_rating,1),
-        'user':user
+        'user':user,
+        'remaining':remaining
     })
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()
