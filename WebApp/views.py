@@ -36,12 +36,6 @@ def filteredEvents(request,dept_name):
         'filter_name':filter_name,
         'alldepartments':alldepartments
     })
-def About(request):
-    alldepartments = DepartmentDb.objects.all()
-    return render(request,'About.html',{'alldepartments':alldepartments})
-def Contact(request):
-    alldepartments = DepartmentDb.objects.all()
-    return render(request,'Contact.html',{'alldepartments':alldepartments})
 def Events(request):
     alldepartments = DepartmentDb.objects.all()
     Completed = EventDb.objects.filter(is_archived=True)

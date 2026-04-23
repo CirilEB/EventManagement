@@ -3,8 +3,6 @@ from WebApp import views
 
 urlpatterns=[
     path('Home/',views.Home,name='Home'),
-    path('About/',views.About,name='About'),
-    path('Contact/',views.Contact,name='Contact'),
     path('Events/',views.Events,name='Events'),
     path('Register/<int:event_id>/',views.Register,name='Register'),
     path('Save_registration',views.Save_registration,name='Save_registration'),
@@ -29,5 +27,5 @@ urlpatterns=[
     path('verify_otp_forgot/',views.verify_otp_forgot,name='verify_otp_forgot'),
     path('Contact_Message',views.Contact_Message,name='Contact_Message'),
     path('mock_success/<int:reg_id>',views.mock_success,name='mock_success'),
-path('mock_failed/<int:reg_id>',views.mock_failed,name='mock_failed')
+    path('mock_failed/<int:reg_id>',views.mock_failed,name='mock_failed')
 ]

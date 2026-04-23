@@ -83,8 +83,6 @@
                         </div>
                     </div>
                     <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link">My Registrations</a>
-                    <a href="{% url 'About' %}" class="nav-item nav-link">About</a>
-                    <a href="{% url 'Contact' %}" class="nav-item nav-link">Contact</a>
                 </div>
                 {% if request.session.Logname %}
                 <a href="{% url 'signout' %}" class="btn btn-primary py-2 px-4">Logout</a>
@@ -122,7 +120,7 @@
                         <div class="section-title position-relative mb-5">
 
                             <h1 class="display-4">{{ register.title }}</h1><br>
-                            <img src="{{ register.poster.url }}" alt="" style="height:500px;"><br><br>
+                            <img src="{{ register.poster.url }}" class="img-fluid w-100 w-md-75 w-lg-50 w-xl-25" alt=""><br><br>
                             <p>{{ register.description }}</p>
                             {% if request.session.Logname %}
                             {% if register.dead < today or total_reg >= register.maxS %}
@@ -272,10 +270,10 @@
 <!--                    </div>-->
                </div>
 
+                <div class="col-lg-4 mt-5 mt-lg-0">
                 {% if request.session.Logname %}
                 {% if register.dead > today %}
                 {% if register.is_archived == False %}
-                <div class="col-lg-4 mt-5 mt-lg-0">
                     <div class="bg-primary mb-5 py-3">
                         <h3 class="text-white py-3 px-4 m-0">Event Details</h3>
                         <div class="d-flex justify-content-between border-bottom px-4">
