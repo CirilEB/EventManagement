@@ -27,6 +27,10 @@ class RegistrationDb(models.Model):
 class StudentDb(models.Model):
     student_name = models.CharField(max_length=50)
     student_email = models.EmailField()
+    student_college = models.CharField(max_length=100,null=True,blank=True)
+    student_dept = models.CharField(max_length=50,null=True,blank=True)
+    student_year = models.CharField(max_length=10,null=True,blank=True)
+    student_mob = models.BigIntegerField(null=True,blank=True)
     student_pass = models.CharField(max_length=128)
     student_otp = models.CharField(max_length=6,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -46,6 +46,8 @@ def Events(request):
         'alldepartments':alldepartments
     })
 def Register(request,event_id):
+    logname = request.session.get('Logname')
+    user = StudentDb.objects.get(student_name=logname)
     alldepartments = DepartmentDb.objects.all()
     register = EventDb.objects.get(id=event_id)
     today = timezone.now().date()
@@ -58,7 +60,8 @@ def Register(request,event_id):
         'today':today,
         'total_reg':total_reg,
         'reviews':reviews,
-        'avg_rating':round(avg_rating,1)
+        'avg_rating':round(avg_rating,1),
+        'user':user
     })
 def Payment(request,stud_id):
     alldepartments = DepartmentDb.objects.all()
@@ -462,4 +465,24 @@ def mock_failed(request,reg_id):
     student.save()
     messages.error(request,"Payment Failed!")
     return redirect(MyRegistrations)
+def view_edit_profile(request):
+    alldepartments = DepartmentDb.objects.all()
+    logname = request.session.get('Logname')
+    user = StudentDb.objects.get(student_name=logname)
+    return render(request,'view_edit_profile.html',{
+        'user':user,
+        'alldepartments':alldepartments
+    })
+def save_edited_profile(request):
+    if request.method == "POST":
+        logname = request.session.get('Logname')
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        college = request.POST.get('college')
+        dept = request.POST.get('dept')
+        year = request.POST.get('year')
+        mob = request.POST.get('mob')
+        StudentDb.objects.filter(student_name=logname).update(student_name=name,student_email=email,student_college=college,student_dept=dept,student_year=year,student_mob=mob)
+        messages.success(request,"Profile Edited Successfully!")
+        return redirect(view_edit_profile)
 

@@ -85,6 +85,7 @@
                     <a href="{% url 'MyRegistrations' %}" class="nav-item nav-link">My Registrations</a>
                 </div>
                 {% if request.session.Logname %}
+                <a class="text-primary m-3" href="{% url 'view_edit_profile' %}"><i class="fas fa-user-circle" style="font-size:35px;"></i></a>
                 <a href="{% url 'signout' %}" class="btn btn-primary py-2 px-4">Logout</a>
                 {% else %}
                 <a href="{% url 'student_loginPage' %}" class="btn btn-primary py-2 px-4">Login</a>
@@ -206,12 +207,12 @@
                                         <input type="hidden" name="dept_name" id="" value="{{ register.euname }}">
                                         <input type="hidden" name="event_date" id="" value="{{ register.start }}">
                                         <input type="hidden" name="fee" id="" value="{{ register.fee }}">
-                                        <input type="text" name="sname" id="" class="form-control" placeholder="Full Name ( This will be put to your certificate )"><br>
-                                        <input type="email" name="semail" id="" class="form-control" placeholder="Email-ID ( For News and Certificate link )"><br>
-                                        <input type="text" name="scollege" id="" class="form-control" placeholder="College Name"><br>
-                                        <input type="text" name="sdept" id="" class="form-control" placeholder="Department"><br>
-                                        <input type="text" name="syear" id="" class="form-control" placeholder="Which year? (example : I/II/III/IV)"><br>
-                                        <input type="text" name="smob" id="" class="form-control" placeholder="Mobile Number"><br>
+                                        <input type="text" name="sname" id="" class="form-control" placeholder="Full Name ( This will be put to your certificate )" value="{{ user.student_name }}"><br>
+                                        <input type="email" name="semail" id="" class="form-control" placeholder="Email-ID ( For News and Certificate link )" value="{{ user.student_email }}"><br>
+                                        <input type="text" name="scollege" id="" class="form-control" placeholder="College Name" value="{{ user.student_college }}"><br>
+                                        <input type="text" name="sdept" id="" class="form-control" placeholder="Department" value="{{ user.student_dept }}"><br>
+                                        <input type="text" name="syear" id="" class="form-control" placeholder="Which year? (example : I/II/III/IV)" value="{{ user.student_year }}"><br>
+                                        <input type="text" name="smob" id="" class="form-control" placeholder="Mobile Number" value="{{ user.student_mob }}"><br>
                                     </div>
                                 </div>
                                 {% endif %}
