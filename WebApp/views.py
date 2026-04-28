@@ -233,6 +233,7 @@ def MyRegistrations(request):
         is_archived = (i.event_name,i.dept_name) in eventArchived
         if not is_archived or i.sattendance == "Present":
             registrations.append(i)
+    registrations.reverse()
     reg_present = RegistrationDb.objects.filter(Logname=student,sattendance="Present").count()
     reg_absent = RegistrationDb.objects.filter(Logname=student,sattendance="Absent").count()
     total_reg = RegistrationDb.objects.filter(Logname=student).count()

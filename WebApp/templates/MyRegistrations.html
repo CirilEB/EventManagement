@@ -141,15 +141,22 @@
         </style>
         <div class="custom-box mx-auto text-start">
         <h1>Registrations done by {{ request.session.Logname }}</h1>
-        <h3>Total Events registered : {{ total_reg }}</h3>
-        <h3>Total Events attended : {{ reg_present }}</h3>
-        <h3>Pending Events : {{ reg_absent }}</h3>
-        <h3>Events marked Absent : {{ reg_absent }}</h3>
+        <h3>Total Events Registered : {{ total_reg }}</h3>
+        <h3>Total Events Attended : {{ reg_present }}</h3>
+        <h3>Events Not Attended : {{ reg_absent }}</h3>
         </div>
         {% endif %}<br>
     <div class="row">
+        <div class="col-md-12">
+            <input class="mt-3 mb-3 p-2" style="width:300px;" type="text" id="searchInput" placeholder="Search by student or event">
+            <select id="statusFilter" class="mt-3 mb-3 p-2">
+                <option value="">All</option>
+                <option value="present">Attended</option>
+                <option value="absent">Not Attended</option>
+            </select>
+        </div>
         {% for i in registrations %}
-        <div class="col-md-4">
+        <div class="col-md-4" data-status="{{ i.sattendance|lower }}" data-filter="reg" data-name="{{ i.sname|lower }}" data-event="{{ i.event_name|lower }}">
     <div class="owl-item active" style="margin-bottom:20px">
         <div class="bg-light p-5" style="height:330px;">
                             {% if i.sattendance == "Present" and i.pay_status == "Paid" %}
@@ -328,6 +335,33 @@
                     }
                 });
             });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded",function () {
+            const statusFilter = document.getElementById("statusFilter");
+            const searchInput = document.getElementById("searchInput");
+            const cards = document.querySelectorAll("[data-filter='reg']");
+            function filterCards(){
+                let search = searchInput.value.toLowerCase().trim();
+                let selectedStatus = statusFilter.value;
+                cards.forEach(card => {
+                    let text = (
+                        (card.dataset.name || "") + " " +
+                        (card.dataset.event || "")
+                    ).toLowerCase();
+                    let status = card.dataset.status || "";
+                    let matchSearch = text.includes(search);
+                    let matchStatus = !selectedStatus || status === selectedStatus;
+                    if (matchSearch && matchStatus){
+                        card.style.display = "";
+                    }else{
+                        card.style.display = "none";
+                    }
+                });
+            }
+            searchInput.addEventListener("keyup",filterCards);
+            statusFilter.addEventListener("change",filterCards);
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
